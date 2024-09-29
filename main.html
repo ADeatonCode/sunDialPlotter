@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="styles/sundial.css">
+        <title>Document</title>
+    </head>
+    <>
+        
+        <h1 id="title">Sundial Plotter</h1>
+        <p id="about">This is a simple sundial plotter using HTML, CSS, and JavaScript. The sun's position is calculated using the Geolocation API and the canvas element to draw the sundial.</p>
+        <div id="locationContainer">
+            <form id="inputForm">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" value="Your Town"><br><br>
+        
+                <label for="lat">Latitude:</label>
+                <input type="number" id="lat" name="coordinates" step="any" value="35.2871"><br><br>
+                
+                <label for="lon">Longitude:</label>
+                <input type="number" id="lon" name="coordinates" step="any" value="-89.1495"><br><br>
+                
+                <label for="description">Description:</label>
+                <input type="text" id="description" name="description" Value="describe the dial you are plotting"><br><br>
+                        
+                <label>Dial Type:</label><br>
+                <input type="radio" id="verticalDial" name="dialType" value="Vertical Dial" checked>
+                <label for="verticalDial">Vertical Dial</label><br>
+                <input type="radio" id="horizontalDial" name="dialType" value="Horizontal Dial">
+                <label for="horizontalDial">Horizontal Dial</label><br><br>
+                
+                <label for="alpha">Alpha:</label>
+                <input type="number" id="alpha" name="alpha" step="any" value="1"><br><br>
+        
+                <label for="tau">Tau:</label>
+                <input type="number" id="tau" name="tau" step="any" value="0"><br><br>
+        
+                <label for="omega">Omega:</label>
+                <input type="number" id="omega" name="omega" step="any" value="180"><br><br>
+        
+                <label for="timeInterval">Time Interval:</label>
+                <input type="number" id="timeInterval" name="timeInterval" step="15" value="15"><br><br>
+        
+                 <button type="button" onclick="readValues()">Submit</button>
+        </div>
+        <hr />
+        <div id="results"></div>
+        <hr />
+        <canvas id="sundialCanvas" width="400" height="400"></canvas>
+        <script src="scripts/sundial.js"></script>
+    </body>
+</html>

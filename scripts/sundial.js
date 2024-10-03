@@ -68,10 +68,10 @@ function zN(lat,dec,lha,hC) {
         return z;
 }
 
-function hAC(hC) {
-    return .0167/tan(hC+8.62/hC)+hC
+function hAC(fhC) {
+    let fHac = .0167/tan(fhC+8.62/(fhC+4.4))+fhC;
+    return fHac;
 }
-
 // Sundial Plotting Functions //
 
 function xVR(a,t,theta,phi) {
@@ -111,19 +111,19 @@ function abs(num) {
 function int(num) {
     return parseInt(num);
 }
+
+function sgn(num) {
+    return Math.sign(num);
+}
 // Rounding interval function
 
-function RoundInterval(NumberToRound,Interval) {
+function roundInterval(NumberToRound,Interval) {
     if (NumberToRound < 0)  { 
-        return abs(int(NumberToRound / Interval + .5) *Interval)*-1;
+        return int(abs(NumberToRound) / Interval + .5) *Interval*-1;
     }else {        
         return int(NumberToRound / Interval + .5)* Interval;
     }
 }
-
-
-
-
 
 // Main function to plot the sundial
 
@@ -143,14 +143,11 @@ function readValues() {
     const dialHeight = parseFloat(document.getElementById('dialHeight').value);
     const dialWidth = parseFloat(document.getElementById('dialWidth').value);
 
-    if (verticalDial.checked === true) {
+    if (verticalDial === true) {
         dialOrientation = "vertical";
-    } else if (horizontalDial.checked === true) {
+    } else if (horizontalDial === true) {
         dialOrientation = "horizontal";
     }
-
-    
-    console.log(`${location}, ${lat}, ${description}, ${verticalDial}, ${horizontalDial}, ${dialOrientation}, ${alpha}, ${tau}, ${omega}, ${timeInterval}, ${dialHeight}, ${dialWidth}`);
     
     // create sundial table
 
@@ -167,19 +164,57 @@ function readValues() {
     let dayLight = sunriseTime * 2          // the number of daylight hours on the Solstice.
     let sunsetTime = sunriseTime + dayLight; // the number of daylight hours on the
 
-    console.log(`${lat}, ${decSunRise}, ${lhaSunrise} (${sunriseTime}).`);
-    console.log(`${dayLight} hours of daylight on the summer solstice`);
-    console.log(`${sunsetTime} sunset on the solstice.`);
-    console.log(); 
-    
+    // Calculate the sunrise and sunset times for the location.
+
+    let timeLines = [];
+    let startTime = roundInterval(12 -sunriseTime, .25);
+    let endTime = roundInterval(sunriseTime + 12, .25);
+
     document.getElementById('results').innerHTML = `
     <h2>Results Table</h2>
-    <p>${now}\n\n</p>
-    <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before and ${sunsetTime} after noon)\n\n.</p>`;
+    <h3>${now}\n\n</h3>
+    <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
+    <p>Sunrise: ${startTime} hours.  Sunset: ${endTime} hours.</p>
+    <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
+    <hr>
+    <h3>Table for a ${dialOrientation} dial.</h3>`;
+    
+    
+    let xx=0
+    let yy=0
+    
+    for (t = startTime; t <= endTime; t += timeInterval/60) {
+        
+        lhaT=(t-12)*15
+        
+        for (decT = -24; decT <=24; decT += 12) {
+            let hhC = hC(lat,decT,lhaT);
+            let zzN = zN(lat,decT,lhaT,hhC);
+            let hhAC = hAC(hhC);
+            let phi = omega - zzN;
+            let theta = hAC;
+            if (hhAC < 0) {
+                break; // the sun is below the horizon
+            }
+            
+            // Calculate the x and y coordinates of the sunrise and sunset points on the dial.
+            
+             
 
-
-
-
+            if (dialOrientation === "vertical") {
+                xx = xVR(alpha,tau,theta,phi);
+                yy = yVR(alpha,tau,theta,phi);
+            } else if (dialOrientation === "horizontal") {
+                xx = xHR(alpha,tau,theta,phi);
+                yy = yHR(alpha,tau,theta,phi);
+            }
+           console.log(lhaT,xx);
+            //if (sgn(lhaT) !== sgn(xx)) {    
+            //    break; // point is outside of the dial    
+            //}
+            console.log(xx,yy);
+        }
+    }
 // Sketch the dial
 
 }

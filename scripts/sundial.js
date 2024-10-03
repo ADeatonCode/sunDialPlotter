@@ -170,42 +170,23 @@ function readValues() {
     let startTime = roundInterval(12 -sunriseTime, .25);
     let endTime = roundInterval(sunriseTime + 12, .25);
 
-    document.getElementById('results').innerHTML = `
-    <h2>Results Table</h2>
-    <h3>${now}\n\n</h3>
-    <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
-    <p>Sunrise: ${startTime} hours.  Sunset: ${endTime} hours.</p>
-    <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
-    <hr>
-    <h3>Table for a ${dialOrientation} dial.</h3>`;
+    
     
     
     let xx=0
     let yy=0
+    console.log(`Start Time: ${startTime}, End time: ${endTime}, and  interval: ${timeInterval} minutes.\n`);
     
     for (t = startTime; t <= endTime; t += timeInterval/60) {
         
         let lhaT=(t-12)*15
-        console.log(t,lhaT);
 
-        for (decT = -24; decT <=24; decT +=6) {
+        for (decT = -24; decT <=24; decT +=48) {
             let hhC = hC(lat,decT,lhaT);
             let zzN = zN(lat,decT,lhaT,hhC);
             let hhAC = hAC(hhC);
-            let phi = omega - zzN;
+            let phi = zzN-omega;
             let theta = hhAC;
-            
-            console.log(decT,hhC,zzN,hhAC,phi,theta);
-
-            if (phi < 0 || phi > 180) {
-                continue; // the sun is below the horizon
-            }
-            if (hhAC < 0) {
-                console.log("below the horizon")
-                break; // the sun is below the horizon
-            }
-            console.log(decT,hhC,zzN,hhAC,phi,theta);
-            // Calculate the x and y coordinates of the sunrise and sunset points on the dial.
 
             if (dialOrientation === "vertical") {
                 xx = xVR(alpha,tau,theta,phi);
@@ -214,16 +195,30 @@ function readValues() {
                 xx = xHR(alpha,tau,theta,phi);
                 yy = yHR(alpha,tau,theta,phi);
             }
-            console.log(xx,yy); 
-            if (sgn(lhaT) !== sgn(xx)) {  
-                console.log("off the dial");  
-                break; // point is outside of the dial    
+
+            document.getElementById('results').innerHTML = `
+            <h2>Results Table</h2>
+            <h3>${now}\n\n</h3>
+            <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
+            <p>Sunrise: ${startTime} hours.  Sunset: ${endTime} hours.</p>
+            <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
+            <hr>
+            <h3>Table for a ${dialOrientation} dial.</h3>`;
+
+            document.getElementById('results').innerHTML = `
+            <tr>
+                <td>${t}</td>
+                <td>${lhaT}</td>
+                <td>${decT}</td>`;
+
+            if (theta>=0 && (phi>-90 && phi<90) && sgn(phi) === sgn(lhaT))  {
+                
+                console.log(`t, lhaT, decT, dialOrientation, theta, phi`);
+                console.log(t,lhaT,decT, dialOrientation, theta, phi);
+                document.getElementById('results').innerHTML =`
+                <p>Time LHA decT dialOrientation theta phi xx yy</p>
+                <p>${t} ${lhaT} ${decT} ${dialOrientation} ${theta} ${phi} ${xx} ${yy}</p>`;
             }
-
         }
-
     }
-
-    // Sketch the dial
-
 }

@@ -185,21 +185,27 @@ function readValues() {
     
     for (t = startTime; t <= endTime; t += timeInterval/60) {
         
-        lhaT=(t-12)*15
-        
-        for (decT = -24; decT <=24; decT += 12) {
+        let lhaT=(t-12)*15
+        console.log(t,lhaT);
+
+        for (decT = -24; decT <=24; decT +=6) {
             let hhC = hC(lat,decT,lhaT);
             let zzN = zN(lat,decT,lhaT,hhC);
             let hhAC = hAC(hhC);
             let phi = omega - zzN;
-            let theta = hAC;
+            let theta = hhAC;
+            
+            console.log(decT,hhC,zzN,hhAC,phi,theta);
+
+            if (phi < 0 || phi > 180) {
+                continue; // the sun is below the horizon
+            }
             if (hhAC < 0) {
+                console.log("below the horizon")
                 break; // the sun is below the horizon
             }
-            
+            console.log(decT,hhC,zzN,hhAC,phi,theta);
             // Calculate the x and y coordinates of the sunrise and sunset points on the dial.
-            
-             
 
             if (dialOrientation === "vertical") {
                 xx = xVR(alpha,tau,theta,phi);
@@ -208,13 +214,16 @@ function readValues() {
                 xx = xHR(alpha,tau,theta,phi);
                 yy = yHR(alpha,tau,theta,phi);
             }
-           console.log(lhaT,xx);
-            //if (sgn(lhaT) !== sgn(xx)) {    
-            //    break; // point is outside of the dial    
-            //}
-            console.log(xx,yy);
+            console.log(xx,yy); 
+            if (sgn(lhaT) !== sgn(xx)) {  
+                console.log("off the dial");  
+                break; // point is outside of the dial    
+            }
+
         }
+
     }
-// Sketch the dial
+
+    // Sketch the dial
 
 }

@@ -6,7 +6,10 @@
 /*                                    */
 /**************************************/
 
-// Functions for Celestial Navigation 
+
+
+
+
 
 // Basic Trig Functions 
 
@@ -99,53 +102,84 @@ function getDayOfYear(date) {
     return day;
 }
 
+// Other functions
+
+function abs(num) {
+    return Math.abs(num);
+}
+
+function int(num) {
+    return parseInt(num);
+}
+// Rounding interval function
+
+function RoundInterval(NumberToRound,Interval) {
+    if (NumberToRound < 0)  { 
+        return abs(int(NumberToRound / Interval + .5) *Interval)*-1;
+    }else {        
+        return int(NumberToRound / Interval + .5)* Interval;
+    }
+}
+
+
+
+
+
+// Main function to plot the sundial
+
 function readValues() {
+
+    var dialOrientation = "";
+
     const location = document.getElementById('location').value;
-    const description = document.getElementById('description').value;
     const lat = parseFloat(document.getElementById('lat').value);
+    const description = document.getElementById('description').value; 
+    const verticalDial = document.getElementById('verticalDial').checked;
+    const horizontalDial = document.getElementById('horizontalDial').checked;
     const alpha = parseFloat(document.getElementById('alpha').value);
     const tau = parseFloat(document.getElementById('tau').value);
     const omega = parseFloat(document.getElementById('omega').value);
     const timeInterval = parseFloat(document.getElementById('timeInterval').value);
-    const dialType = document.querySelector('input[name="dialType"]:checked').value;
+    const dialHeight = parseFloat(document.getElementById('dialHeight').value);
+    const dialWidth = parseFloat(document.getElementById('dialWidth').value);
 
-    let now = new Date();    
-    let hours = now.getHours()+now.getMinutes()/60+now.getSeconds()/3600;
-    console.log(now,hours);    
+    if (verticalDial.checked === true) {
+        dialOrientation = "vertical";
+    } else if (horizontalDial.checked === true) {
+        dialOrientation = "horizontal";
+    }
+
     
-    dec=23.45 * sin( (360 / 365) * (getDayOfYear(now) + 10) )
-    lha=(hours-12)*15;
-    a=alpha;
-    t=tau;
-    w=omega;
-
-    let h=hC(lat,dec,lha);
-    let hA=hAC(h);
-    let aZ=zN(lat,dec,lha,h)
-    let phi=aZ-w;
-    let theta=h;
+    console.log(`${location}, ${lat}, ${description}, ${verticalDial}, ${horizontalDial}, ${dialOrientation}, ${alpha}, ${tau}, ${omega}, ${timeInterval}, ${dialHeight}, ${dialWidth}`);
     
-    let xV=xVR(a,t,theta,phi);
-    let yV=yVR(a,t,theta,phi);
+    // create sundial table
 
-    let xH=xHR(a,t,theta,phi);
-    let yH=yHR(a,t,theta,phi);
+    let now = new Date();  // get todays date 
+    
+    if ( lat < 0) {         // this sets the lat at the summer solstice; + for northern hemisphere and = for southern hemisphere.
+        decSunRise = -24;
+    }else {
+        decSunRise = 24;
+    }
 
-    console.log(`At LHA: ${lha} (${now}) the sun is at Hc:(angle above the horizon) ${h}\n and will be visible at Ha:(corrected for Atmospheric refraction) ${hA}\n at an azimuth of ${aZ} degrees.`);
-    console.log(`With the base of the Sundial facing ${w}: and tilted at ${t} degrees:`);
-    console.log(`Vertical dial plot: \nx=${xV}, y=${yV}\nHorizontal dial plot: \nx=${xH}, y=${yH}`);
+    let lhaSunrise = acs(-tan(lat)*tan(decSunRise));  // calculates the LHA value for the number of hours before and after noon (0) the sunrise will take place.
+    let sunriseTime = lhaSunrise / 15;
+    let dayLight = sunriseTime * 2          // the number of daylight hours on the Solstice.
+    let sunsetTime = sunriseTime + dayLight; // the number of daylight hours on the
 
-    console.log(`vertical (0 tilt) dial plot:   \nx= ${a*tan(phi)} y =${-1*a*tan(theta)/cos(phi)}`);
-    console.log(`Horizontal (0 tilt) dial plot: \nx= ${a*sin(phi)/tan(theta)} y = ${a*cos(phi)/tan(theta)}.`);
+    console.log(`${lat}, ${decSunRise}, ${lhaSunrise} (${sunriseTime}).`);
+    console.log(`${dayLight} hours of daylight on the summer solstice`);
+    console.log(`${sunsetTime} sunset on the solstice.`);
+    console.log(); 
+    
+    document.getElementById('results').innerHTML = `
+    <h2>Results Table</h2>
+    <p>${now}\n\n</p>
+    <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before and ${sunsetTime} after noon)\n\n.</p>`;
 
 
-     // Display results on web page
 
-     document.getElementById('results').innerHTML = `
-        <h2>Results</h2>
-        <p>${now}\n\n</p>
-        <p>At LHA: ${lha} the sun has a declination of ${dec} and is at Hc:(angle above the horizon) ${h}\n and will be visible at Ha:(corrected for Atmospheric refraction) ${hA}\n at an azimuth of ${aZ} degrees.\n\n</p>
-        <p>With the base of the Sundial facing ${w}: and tilted at ${t} degrees:\n\n</p>
-        <p>Vertical dial plot: \nx=${xV}, y=${yV}\nHorizontal dial plot: \nx=${xH}, y=${yH}</p>
-        <p>Vertical (0 tilt) dial plot:   \nx= ${a*tan(phi)} y =${-1*a*tan(theta)/cos(phi)}\n Horizontal (0 tilt) dial plot: \nx= ${a*sin(phi)/tan(theta)} y = ${a*cos(phi)/tan(theta)}.</p>`;
+
+// Sketch the dial
+
 }

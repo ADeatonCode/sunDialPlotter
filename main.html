@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="styles/sundial.css">
         <title>Document</title>
     </head>
-    <>
+    <body>
         
         <h1 id="title">Sundial Plotter</h1>
         <p id="about">This is a simple sundial plotter using HTML, CSS, and JavaScript. The sun's position is calculated using the Geolocation API and the canvas element to draw the sundial.</p>
@@ -18,16 +18,13 @@
                 <label for="lat">Latitude:</label>
                 <input type="number" id="lat" name="coordinates" step="any" value="35.2871"><br><br>
                 
-                <label for="lon">Longitude:</label>
-                <input type="number" id="lon" name="coordinates" step="any" value="-89.1495"><br><br>
-                
                 <label for="description">Description:</label>
                 <input type="text" id="description" name="description" Value="describe the dial you are plotting"><br><br>
                         
-                <label>Dial Type:</label><br>
-                <input type="radio" id="verticalDial" name="dialType" value="Vertical Dial" checked>
+                <h2 id="dialType">Dial Type:</h2>
+                <input type="radio" id="verticalDial" name="dialType"  value="v" checked>
                 <label for="verticalDial">Vertical Dial</label><br>
-                <input type="radio" id="horizontalDial" name="dialType" value="Horizontal Dial">
+                <input type="radio" id="horizontalDial" name="dialType" value="h">
                 <label for="horizontalDial">Horizontal Dial</label><br><br>
                 
                 <label for="alpha">Alpha:</label>
@@ -42,7 +39,14 @@
                 <label for="timeInterval">Time Interval:</label>
                 <input type="number" id="timeInterval" name="timeInterval" step="15" value="15"><br><br>
         
-                 <button type="button" onclick="readValues()">Submit</button>
+                <label for="dialHeight">Dial Length:</label>
+                <input type="number" id="dialHeight" name="dialSize" step="1" value="100"></input>
+                
+                <label for="dialWidth">Dial Width:</label>
+                <input type "number" id="dialWidth" name="dialSize" step="1" value="100"></input>
+                <br><br>
+                <button type="button" onclick="readValues()">Submit</button>
+            </form>
         </div>
         <hr />
         <div id="results"></div>

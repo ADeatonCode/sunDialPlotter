@@ -6,9 +6,28 @@
 /*                                    */
 /**************************************/
 
+// Define global variables and objects
 
-
-
+var timeLines = [
+    {
+        "time": 0,
+        "lha": 0,
+        "tL": [
+            {
+                "dec": 0,
+                "Hc": 0,
+                "Hac": 0,
+                "Zn": 0,
+                "x": 0,
+                "y": 0
+            }
+        ]
+    }
+];
+var xMax = 0;
+var yMax = 0;
+var xMin = 0;
+var yMin = 0;
 
 
 // Basic Trig Functions 
@@ -166,22 +185,29 @@ function readValues() {
 
     // Calculate the sunrise and sunset times for the location.
 
-    let timeLines = [];
-    let startTime = roundInterval(12 -sunriseTime, .25);
-    let endTime = roundInterval(sunriseTime + 12, .25);
+    let startTime = roundInterval(12 -sunriseTime, .25)+.25;
+    let endTime = roundInterval(sunriseTime + 12, .25)-.25;
 
-    
-    
-    
+    document.getElementById('results').innerHTML = `
+            <h2>Results Table</h2>
+            <h3>${now}\n\n</h3>
+            <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
+            <p>Sunrise: ${startTime*100} hours.  Sunset: ${endTime*100} hours.</p>
+            <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
+            <hr>
+            <h3>Table for a ${dialOrientation} dial.</h3>`;
+
     let xx=0
     let yy=0
-    console.log(`Start Time: ${startTime}, End time: ${endTime}, and  interval: ${timeInterval} minutes.\n`);
     
     for (t = startTime; t <= endTime; t += timeInterval/60) {
-        
+                
         let lhaT=(t-12)*15
+        
+        timeLines.push({time: t, lha: lhaT, tL: []});
+        var index =  timeLines.length - 1;
 
-        for (decT = -24; decT <=24; decT +=48) {
+        for (decT = -24; decT <=24; decT +=.1) {
             let hhC = hC(lat,decT,lhaT);
             let zzN = zN(lat,decT,lhaT,hhC);
             let hhAC = hAC(hhC);
@@ -196,29 +222,52 @@ function readValues() {
                 yy = yHR(alpha,tau,theta,phi);
             }
 
-            document.getElementById('results').innerHTML = `
-            <h2>Results Table</h2>
-            <h3>${now}\n\n</h3>
-            <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
-            <p>Sunrise: ${startTime} hours.  Sunset: ${endTime} hours.</p>
-            <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
-            <hr>
-            <h3>Table for a ${dialOrientation} dial.</h3>`;
-
-            document.getElementById('results').innerHTML = `
-            <tr>
-                <td>${t}</td>
-                <td>${lhaT}</td>
-                <td>${decT}</td>`;
-
             if (theta>=0 && (phi>-90 && phi<90) && sgn(phi) === sgn(lhaT))  {
-                
-                console.log(`t, lhaT, decT, dialOrientation, theta, phi`);
-                console.log(t,lhaT,decT, dialOrientation, theta, phi);
-                document.getElementById('results').innerHTML =`
-                <p>Time LHA decT dialOrientation theta phi xx yy</p>
-                <p>${t} ${lhaT} ${decT} ${dialOrientation} ${theta} ${phi} ${xx} ${yy}</p>`;
+                timeLines[index].tL.push({dec: decT, theta: theta, phi: phi, x: xx, y: yy});
+
+                if (xMax< xx) { 
+                xMax = xx;   
+                }
+
+                if (yMax < yy) {
+                yMax = yy;
+                }
+
+                if (xMin> xx) {
+                    xMin = xx;
+                }
+
+                if (yMin> yy) {
+                    yMin = yy;
+                }
             }
+        }
+    }
+
+    var shiftTime = timeLines.shift();
+    
+    // Display the time Lines Data for each point on the dial.
+
+    
+
+    // Draw the dial
+    
+    var canvas = document.getElementById('sundialCanvas');
+    var ctx = canvas.getContext('2d');
+    
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    console.log(innerHeight,innerWidth);
+
+    for (var i=0;i=timeLines.arraylength-1;  i++) {
+        for (var j=0;j<timeLines[i].tL.arraylength-1;j++) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            ctx.moveTo(innerWidth/2+timeLines[i].tL[j].x*dialWidth,innerHeight/2-timelines[i].tL[j].y*dialHeight);
+            ctx.lineTo(innerWidth/2+timeLines[i+1].tL[j].x*dialWidth,innerHeight/2-timelines[i+1].tL[j].y*dialHeight);
+            ctx.stroke();
         }
     }
 }

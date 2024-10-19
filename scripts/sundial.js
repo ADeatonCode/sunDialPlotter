@@ -28,7 +28,7 @@ var xMax = 0;
 var yMax = 0;
 var xMin = 0;
 var yMin = 0;
-
+var xSign = 0;
 
 // Basic Trig Functions 
 
@@ -159,7 +159,10 @@ function readValues() {
     const description = document.getElementById('description').value; 
     const verticalDial = document.getElementById('verticalDial').checked;
     const horizontalDial = document.getElementById('horizontalDial').checked;
+    const frontView = document.getElementById('frontView').checked;
+    const backView = document.getElementById('backView').checked;
     const alpha = parseFloat(document.getElementById('alpha').value);
+    const beta = parseFloat(document.getElementById('beta').value);
     const tau = parseFloat(document.getElementById('tau').value);
     const omega = parseFloat(document.getElementById('omega').value);
     const timeInterval = parseFloat(document.getElementById('timeInterval').value);
@@ -170,6 +173,12 @@ function readValues() {
         dialOrientation = "vertical";
     } else if (horizontalDial === true) {
         dialOrientation = "horizontal";
+    }
+    
+    if (frontView === true) {
+        xSign =1
+    } else if (backView === true) {
+        xSign = -1
     }
     
     // create sundial table
@@ -226,11 +235,16 @@ function readValues() {
 
             if (dialOrientation === "vertical") {
                 xx = xVR(alpha,tau,theta,phi);
-                yy = yVR(alpha,tau,theta,phi);
+                yy = -yVR(alpha,tau,theta,phi);
             } else if (dialOrientation === "horizontal") {
                 xx = xHR(alpha,tau,theta,phi);
-                yy = yHR(alpha,tau,theta,phi);
+                yy = -yHR(alpha,tau,theta,phi);
             }
+            
+            if (backView === true) {
+                xx = -xx;
+            }
+            
             var canvas = document.getElementById('sundialCanvas');
             var ctx = canvas.getContext('2d');
 
@@ -244,7 +258,7 @@ function readValues() {
                 canvas.width = innerHeight * dialWidth/dialHeight;
             }
             cvt = canvas.width/dialWidth
-            
+
             if (theta>=0 && (phi>-90 && phi<90) ) {
 
                 timeLines[index].tL.push({dec: decT, theta: theta, phi: phi, x: xx, y: yy});
@@ -280,10 +294,8 @@ function readValues() {
     //document.getElementById('timeLineData').innerHTML = `</div>`
     }
     // document.getElementById('timeLineData').innerHTML = timeLineHTML;
-// Draw the dial
-    
-    
-    
+
+    // Draw the dial   
 
     ctx.fillStyle = 'tan';
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -294,15 +306,33 @@ function readValues() {
     
     if (dialOrientation === "vertical") {
         xOffset=canvas.width/2;
-        yOffset=canvas.height * sin(tau);
+        yOffset=beta * cvt;
     } else if (dialOrientation === "horizontal") {
         xOffset=canvas.width/2;
-        yOffset=canvas.height/2;
+        yOffset=canvas.height - beta* cvt;
     }
     console.log(`x offset: ${xOffset}, y offset: ${yOffset}`)
         
     console.log('plotting the dial');    
+    
     ctx.translate(xOffset,yOffset);
+    
+    // Draw the origan.
+
+    ctx.beginPath();
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 1;
+    if (yOffset === 0) {
+        ctx.moveTo(-1,1);
+        ctx.lineTo(0,0);
+        ctx.lineTo(1,1);
+    } else {
+        ctx.moveTo(-1,0)
+        ctx.lineTo(1,0);
+        ctx.moveTo(0,-1)
+        ctx.lineTo(0,1);
+    }
+    ctx.stroke();
 
     for (var i = 0; i < timeLines.length; i++) {
         console.log(`${i}, time: ${timeLines[i].time}, Length: ${timeLines[i].tL.length}`)
@@ -317,12 +347,12 @@ function readValues() {
                 ctx.lineWidth = 2;
             }
             
-            ctx.moveTo(int(timeLines[i].tL[0].x * cvt),-int(timeLines[i].tL[0].y * cvt));
+            ctx.moveTo(int(timeLines[i].tL[0].x * cvt),int(timeLines[i].tL[0].y * cvt));
         }
         for(var j = 0; j <timeLines[i].tL.length; j++) {
             
             console.log(int(timeLines[i].tL[j].x * cvt),int(timeLines[i].tL[j].y * cvt));
-            ctx.lineTo(int(timeLines[i].tL[j].x * cvt),-int(timeLines[i].tL[j].y * cvt));
+            ctx.lineTo(int(timeLines[i].tL[j].x * cvt),int(timeLines[i].tL[j].y * cvt));
         }
     ctx.stroke();
     }   

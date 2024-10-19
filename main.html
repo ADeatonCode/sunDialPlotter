@@ -10,50 +10,63 @@
         
         <h1 id="title">Sundial Plotter</h1>
         <p id="about">This is a simple sundial plotter using HTML, CSS, and JavaScript. The sun's position is calculated using the Geolocation API and the canvas element to draw the sundial.</p>
-        <div id="locationContainer">
+        <form id="locationContainer">
             <form id="inputForm">
-                <label for="location">Location:</label>
-                <input type="text" id="location" name="location" value="Your Town"><br><br>
+                <div class="location-row">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" value="Your Town">
+                    <label for="lat">Latitude:</label>
+                    <input type="number" id="lat" name="coordinates" step="any" value="36.1522">
+                </div>
+                <br>
+                <div class="type-row">                        
+                    <div class="type-col">
+                        <p id="dialType">Dial Type:</p>
+                        <input type="radio" id="verticalDial" name="dialType"  value="v" checked>
+                        <label for="verticalDial">Vertical Dial</label>
+                        <br>
+                        <input type="radio" id="horizontalDial" name="dialType" value="h">
+                        <label for="horizontalDial">Horizontal Dial</label><br><br>
+                    </div>
+                    <label for="description">Description:</label>
+                    <textarea rows = "10" columns = "20" id="description" name="description" placeholder = "describe the dial you are plotting"></textarea>
+                </div>
+                <br>
+                <div class="specification-row">
+                    <label for="alpha">Gnomon Distance:</label>
+                    <input type="number" id="alpha" name="alpha" step="any" value="1"><br><br>
         
-                <label for="lat">Latitude:</label>
-                <input type="number" id="lat" name="coordinates" step="any" value="36.1522"><br><br>
+                    <label for="tau">tilt:</label>
+                    <input type="number" id="tau" name="tau" step="any" value="0"><br><br>
+        
+                    <label for="omega">Dial direction:</label>
+                    <input type="number" id="omega" name="omega" step="any" value="180"><br><br>
+        
+                    <label for="timeInterval">Time Interval:</label>
+                    <input type="number" id="timeInterval" name="timeInterval" step="15" value="15"><br><br>
+                </div>        
+                <br>
+                <div class="dialSize-row">
+                    <label for="dialHeight">Dial Height:</label>
+                    <input type="number" id="dialHeight" name="dialSize" step="1" value="100">
                 
-                <label for="description">Description:</label>
-                <input type="text" id="description" name="description" Value="describe the dial you are plotting"><br><br>
-                        
-                <p id="dialType">Dial Type:</p>
-                <input type="radio" id="verticalDial" name="dialType"  value="v" checked>
-                <label for="verticalDial">Vertical Dial</label><br>
-                <input type="radio" id="horizontalDial" name="dialType" value="h">
-                <label for="horizontalDial">Horizontal Dial</label><br><br>
-                
-                <label for="alpha">Alpha:</label>
-                <input type="number" id="alpha" name="alpha" step="any" value="1"><br><br>
-        
-                <label for="tau">Tau:</label>
-                <input type="number" id="tau" name="tau" step="any" value="0"><br><br>
-        
-                <label for="omega">Omega:</label>
-                <input type="number" id="omega" name="omega" step="any" value="180"><br><br>
-        
-                <label for="timeInterval">Time Interval:</label>
-                <input type="number" id="timeInterval" name="timeInterval" step="15" value="15"><br><br>
-        
-                <label for="dialHeight">Dial Length:</label>
-                <input type="number" id="dialHeight" name="dialSize" step="1" value="100"></input>
-                
-                <label for="dialWidth">Dial Width:</label>
-                <input type "number" id="dialWidth" name="dialSize" step="1" value="100"></input>
-                <br><br>
-                <button type="button" onclick="readValues()">Submit</button>
+                    <label for="dialWidth">Dial Width:</label>
+                    <input type="number" id="dialWidth" name="dialSize" step="1" value="100">
+                    <br><br>
+                </div>
+                <div class="buttonContainer">
+                    <button type="button" onclick="readValues()">Submit</button>
+                </div>  
             </form>
         </div>
         <hr />
         <div id="results"></div>
         <hr />
-        <div id="timeLineData"></div>
+        <div class="timeLineData"></div>
         <hr />
-        <canvas id="sundialCanvas" width="400" height="400"></canvas>
+        <div class="canvas-container">
+            <canvas id="sundialCanvas" width="400" height="400"></canvas>
+        </div>
         <script src="scripts/sundial.js"></script>
     </body>
 </html>

@@ -110,12 +110,16 @@ function yHR(a,t,theta,phi) {
 }
 
 function getDayOfYear(date) {
+    
     // Create a new date object for the first day of the year
     const start = new Date(date.getFullYear(), 0, 0);
+    
     // Calculate the difference in milliseconds
     const diff = date - start;
+    
     // Convert milliseconds to days
     const oneDay = 1000 * 60 * 60 * 24;
+    
     // Calculate the day of the year
     const day = Math.floor(diff / oneDay);
     return day;
@@ -147,7 +151,7 @@ function roundInterval(NumberToRound,Interval) {
 // Main function to plot the sundial
 
 function readValues() {
-
+    
     var dialOrientation = "";
 
     const location = document.getElementById('location').value;
@@ -190,13 +194,18 @@ function readValues() {
 
     document.getElementById('results').innerHTML = `
             <h2>Results Table</h2>
+            <hr />
             <h3>${now}\n\n</h3>
             <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
             <p>Sunrise: ${startTime*100} hours.  Sunset: ${endTime*100} hours.</p>
             <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
             <hr>
-            <h3>Table for a ${dialOrientation} dial.</h3>`;
+            <h3>Table for a ${dialOrientation} dial.</h3>
+            <p>Dial Facing: ${omega} degrees.  Gnomon Distance: ${alpha}.  Dial tilt: ${tau} degrees`;
 
+    // calculate the timelines for the current Latitude.
+
+    timeLines.length=0;
     let xx=0
     let yy=0
     
@@ -205,9 +214,10 @@ function readValues() {
         let lhaT=(t-12)*15
         
         timeLines.push({time: t, lha: lhaT, tL: []});
+        
         var index =  timeLines.length - 1;
-
-        for (decT = -24; decT <=24; decT +=.1) {
+    
+        for (decT = -24; decT <=24; decT +=.5) {
             let hhC = hC(lat,decT,lhaT);
             let zzN = zN(lat,decT,lhaT,hhC);
             let hhAC = hAC(hhC);
@@ -221,10 +231,24 @@ function readValues() {
                 xx = xHR(alpha,tau,theta,phi);
                 yy = yHR(alpha,tau,theta,phi);
             }
+            var canvas = document.getElementById('sundialCanvas');
+            var ctx = canvas.getContext('2d');
 
-            if (theta>=0 && (phi>-90 && phi<90) && sgn(phi) === sgn(lhaT))  {
+            var cvt = 0
+            
+            if (dialWidth>dialHeight) {    
+                canvas.width = innerWidth;
+                canvas.height = innerWidth * dialHeight/dialWidth;
+            } else {
+                canvas.height = innerHeight;
+                canvas.width = innerHeight * dialWidth/dialHeight;
+            }
+            cvt = canvas.width/dialWidth
+            
+            if (theta>=0 && (phi>-90 && phi<90) ) {
+
                 timeLines[index].tL.push({dec: decT, theta: theta, phi: phi, x: xx, y: yy});
-
+            
                 if (xMax< xx) { 
                 xMax = xx;   
                 }
@@ -240,36 +264,66 @@ function readValues() {
                 if (yMin> yy) {
                     yMin = yy;
                 }
-            }
+            } 
         }
     }
+    var firstElement = timeLines.shift()
+    //console.log(timeLines);
 
-    var shiftTime = timeLines.shift();
-    
-    // Display the time Lines Data for each point on the dial.
+// Display the time Lines Data for each point on the dial.
 
-    for (var i=0; i<timeLines.arraylength; i++) {
-        console.log(i);
+    for (i=0; i<timeLines.length - 1; i++) {
+        // document.getElementById('timeLineData').innerHTML = `<div id="timeLineData-Row">
+        //                                                         <h4 class="timeLine">${timeLines[i].time}</h4>`;
+        for (var j=0;j<timeLines[i].tL.length-1; j++) {
+        }
+    //document.getElementById('timeLineData').innerHTML = `</div>`
     }
-
-    // Draw the dial
+    // document.getElementById('timeLineData').innerHTML = timeLineHTML;
+// Draw the dial
     
-    var canvas = document.getElementById('sundialCanvas');
-    var ctx = canvas.getContext('2d');
     
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
+    
 
-    console.log(innerHeight,innerWidth);
+    ctx.fillStyle = 'tan';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    console.log(`x: ${xMin}, ${xMax}, ${xMax-xMin} (${canvas.width})      y: ${yMin}, ${yMax}, ${yMax-yMin} (${canvas.height}) `);
+    console.log(innerWidth,innerHeight);
+    console.log(`cvt: ${cvt}`);
+    
+    if (dialOrientation === "vertical") {
+        xOffset=canvas.width/2;
+        yOffset=canvas.height * sin(tau);
+    } else if (dialOrientation === "horizontal") {
+        xOffset=canvas.width/2;
+        yOffset=canvas.height/2;
+    }
+    console.log(`x offset: ${xOffset}, y offset: ${yOffset}`)
+        
+    console.log('plotting the dial');    
+    ctx.translate(xOffset,yOffset);
 
-    for (var i=0;i=timeLines.arraylength-1;  i++) {
-        for (var j=0;j<timeLines[i].tL.arraylength-1;j++) {
+    for (var i = 0; i < timeLines.length; i++) {
+        console.log(`${i}, time: ${timeLines[i].time}, Length: ${timeLines[i].tL.length}`)
+        
+        if (timeLines[i].tL.length>0) {
+
             ctx.beginPath();
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 1;
-            ctx.moveTo(innerWidth/2+timeLines[i].tL[j].x*dialWidth,innerHeight/2-timelines[i].tL[j].y*dialHeight);
-            ctx.lineTo(innerWidth/2+timeLines[i+1].tL[j].x*dialWidth,innerHeight/2-timelines[i+1].tL[j].y*dialHeight);
-            ctx.stroke();
+            
+            if (timeLines[i].time === int(timeLines[i].time)) {
+                ctx.lineWidth = 2;
+            }
+            
+            ctx.moveTo(int(timeLines[i].tL[0].x * cvt),-int(timeLines[i].tL[0].y * cvt));
         }
-    }
+        for(var j = 0; j <timeLines[i].tL.length; j++) {
+            
+            console.log(int(timeLines[i].tL[j].x * cvt),int(timeLines[i].tL[j].y * cvt));
+            ctx.lineTo(int(timeLines[i].tL[j].x * cvt),-int(timeLines[i].tL[j].y * cvt));
+        }
+    ctx.stroke();
+    }   
 }

@@ -248,7 +248,9 @@ function readValues() {
     
     // Display the time Lines Data for each point on the dial.
 
-    
+    for (var i=0; i<timeLines.arraylength; i++) {
+        console.log(i);
+    }
 
     // Draw the dial
     

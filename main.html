@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="styles/sundial.css">
-        <title>Document</title>
+        <title>Sun Dial Plotter</title>
     </head>
     <body>
         
@@ -42,15 +42,15 @@
                 <br>
                 <div class="specification-row">
                     <label for="alpha">Gnomon Distance:</label>
-                    <input type="number" id="alpha" name="alpha" step="any" value="1"><br><br>
+                    <input type="number" id="alpha" name="alpha" step="any" value="6.4568"><br><br>
         
                     <label for="beta">Gnomon length:</label>  
-                    <input type="number" id="beta" name="beta" step="any" value="1"><br><br>
+                    <input type="number" id="beta" name="beta" step="any" value="5"><br><br>
                     <label for="tau">tilt:</label>
                     <input type="number" id="tau" name="tau" step="any" value="0"><br><br>
         
                     <label for="omega">Dial direction:</label>
-                    <input type="number" id="omega" name="omega" step="any" value="180"><br><br>
+                    <input type="number" id="omega" name="omega" step="any" value="112.5"><br><br>
         
                     <label for="timeInterval">Time Interval:</label>
                     <input type="number" id="timeInterval" name="timeInterval" step="15" value="15"><br><br>
@@ -58,10 +58,10 @@
                 <br>
                 <div class="dialSize-row">
                     <label for="dialHeight">Dial Height:</label>
-                    <input type="number" id="dialHeight" name="dialSize" step="1" value="100">
+                    <input type="number" id="dialHeight" name="dialSize" step="1" value="28">
                 
                     <label for="dialWidth">Dial Width:</label>
-                    <input type="number" id="dialWidth" name="dialSize" step="1" value="100">
+                    <input type="number" id="dialWidth" name="dialSize" step="1" value="12">
                     <br><br>
                 </div>
 
@@ -73,8 +73,21 @@
         <hr />
         <div id="results"></div>
         <hr />
-        <div class="timeLineData"></div>
+        <table id="data-table" border="1">
+            <thead>
+                <tr id="header-row">
+                    <!-- Dynamic headers will be added here -->
+                </tr>
+            </thead>
+            <tbody id="body-row">
+                <!-- Data rows will be dynamically added here -->
+            </tbody>
+        </table>
+        <div id="downloadButtonContainer">    
+            <button id="downloadButton" onclick="downloadCSV()">Download CSV</button>
+        </div>
         <hr />
+        <h2 id="dialPlotTitle">Dial Plot</h2>
         <div class="canvas-container">
             <canvas id="sundialCanvas" width="400" height="400"></canvas>
         </div>

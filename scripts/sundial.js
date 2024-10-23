@@ -148,6 +148,38 @@ function roundInterval(NumberToRound,Interval) {
     }
 }
 
+function timeHM(time) {
+    let hours = int(time);
+    let minutes = int((time - hours) * 60);
+    return `${hours < 10? '0' + hours : hours}:${minutes < 10? '0' + minutes : minutes}`;
+}
+
+function arrayToCSV(data) {
+    const headers = Object.keys(data[0]).concat(Object.keys(data[0].tL[0]));
+    const rows = data.map(item =>
+        headers.map(header =>
+        header in item ? item[header] : item.tL.map(tLItem => tLItem[header]).join(';')
+        ).join(',')
+    );
+    return headers.join(',') + '\n' + rows.join('\n');
+}
+
+function downloadCSV() {
+    const csv = arrayToCSV(timeLines);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const filename = prompt('Enter filename:');
+    if (filename !== null) {
+        a.href = url;
+        a.download = `${filename}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+}
+
 // Main function to plot the sundial
 
 function readValues() {
@@ -284,17 +316,52 @@ function readValues() {
     var firstElement = timeLines.shift()
     //console.log(timeLines);
 
-// Display the time Lines Data for each point on the dial.
+    // Display the time Lines Data for each point on the dial.
+    
+    var tableBody = document.getElementById('data-table').getElementsByTagName('header-row')[0];
+        // tableBody.innerHTML = ''
+    var tableBody = document.getElementById('data-table').getElementsByTagName('body-row')[0];
+        // tableBody.innerHTML = ''
+    headerRow = document.getElementById('header-row');
+    bodyRow = document.getElementById('body-row');
 
-    for (i=0; i<timeLines.length - 1; i++) {
-        // document.getElementById('timeLineData').innerHTML = `<div id="timeLineData-Row">
-        //                                                         <h4 class="timeLine">${timeLines[i].time}</h4>`;
-        for (var j=0;j<timeLines[i].tL.length-1; j++) {
+    // Loop through timeLines to create dynamic headers and data rows
+    timeLines.forEach(timeline => {
+        const time = timeline.time;
+
+        // Add a header for the current time if there's data
+        if (timeline.tL.length > 0) {
+            const headerCell = document.createElement('th');
+            headerCell.textContent = `${timeHM(time)}`;
+            headerRow.appendChild(headerCell);
+
+            // Create a row for the values under this time column
+            const dataCell = document.createElement('td');
+            dataCell.textContent = `DEC, X, Y`;
+            // Create inner rows for dec, x, y values
+            timeline.tL.forEach(tl => {
+                const innerRow = document.createElement('tr');  
+                // Adding values to the corresponding inner row
+                const decCell = document.createElement('td');
+                decCell.textContent = tl.dec;
+                innerRow.appendChild(decCell);
+
+                const xCell = document.createElement('td');
+                xCell.textContent = tl.x;
+                innerRow.appendChild(xCell);
+
+                const yCell = document.createElement('td');
+                yCell.textContent = tl.y;
+                innerRow.appendChild(yCell);
+
+                dataCell.appendChild(innerRow);
+            });
+
+            // Append the corresponding data cell into the body
+            bodyRow.appendChild(dataCell);
         }
-    //document.getElementById('timeLineData').innerHTML = `</div>`
-    }
-    // document.getElementById('timeLineData').innerHTML = timeLineHTML;
-
+    });
+    
     // Draw the dial   
 
     ctx.fillStyle = 'tan';

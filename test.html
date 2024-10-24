@@ -3,9 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dynamic Time Table</title>
+    <style>
+        /* Make both Dec row headers and time column headers bold */
+        th {
+            font-weight: bold; /* Set header font weight to bold */
+        }
+        td.row-header {
+            font-weight: bold; /* Make row headers bold */
+        }
+    </style>
 </head>
 <body>
-    
+
+<table id="data-table" border="1">
+    <thead>
+        <tr>
+            <th>Dec</th> <!-- Row header for Dec -->
+            <!-- Dynamic time headers will be added here -->
+        </tr>
+    </thead>
+    <tbody id="body-row">
+        <!-- Data rows will be dynamically added here -->
+    </tbody>
+</table>
+
+<script>
+    var timeLines = [
+        { "time": "0600", "lha": 0, "tL": [ { "dec": 24, "x": 1, "y": 1 }, { "dec": 23.5, "x": 21, "y": 2 } ] },
+        { "time": "0700", "lha": 0, "tL": [ { "dec": 24, "x": 1, "y": 2 }, { "dec": 23.5, "x": 21, "y": 4 } ] },
+        { "time": "0800", "lha": 0, "tL": [ { "dec": 24, "x": 1, "y": 3 }, { "dec": 23.5, "x": 20, "y": 6 } ] }
+    ];
+
+    const headerRow = document.querySelector('#data-table thead tr');
+    const bodyRow = document.getElementById('body-row');
+
+    // Step 1: Create time headers directly without extra empty cell
+    timeLines.forEach(timeline => {
+        const timeHeader = document.createElement('th');
+        timeHeader.textContent = timeline.time; // Add time value as header
+        headerRow.appendChild(timeHeader); // Append to header row
+    });
+
+    // Step 2: Create a Set to hold unique dec values for row headers
+    const rowDecs = new Set();
+    timeLines.forEach(timeline => {
+        timeline.tL.forEach(tl => {
+            rowDecs.add(tl.dec); // Collect unique declination values
+        });
+    });
+
+    // Convert Set to Array for Iteration
+    const rowDecArray = Array.from(rowDecs).sort((a, b) => b - a); // Sort in descending order
+
+    // Step 3: Create rows for each dec value
+    rowDecArray.forEach(dec => {
+        const row = bodyRow.insertRow(); // Create a new row for each dec
+        const rowHeaderCell = row.insertCell(0); // Create first cell for the row header
+        rowHeaderCell.textContent = dec; // Set the dec value as the row header
+        rowHeaderCell.className = 'row-header'; // Add class for bold formatting
+
+        timeLines.forEach(timeline => {
+            const tlData = timeline.tL.find(tl => tl.dec === dec); // Find matching data for this dec
+            const cell = row.insertCell(); // Create a new cell for each time
+
+            if (tlData) {
+                cell.textContent = `${tlData.x}, ${tlData.y}`; // Display the coordinates
+            } else {
+                cell.textContent = ''; // No matching data for this cell
+            }
+        });
+    });
+    function saveFile() {
+        var content = "Hello, this is the content of the file!"; // Replace with your actual data
+        var blob = new Blob([content], { type: 'text/plain' });
+        var url = window.URL.createObjectURL(blob);
+      
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'example.txt'; // Default filename
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      
+
+</script>
+
 </body>
 </html>

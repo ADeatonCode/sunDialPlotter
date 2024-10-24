@@ -154,31 +154,42 @@ function timeHM(time) {
     return `${hours < 10? '0' + hours : hours}:${minutes < 10? '0' + minutes : minutes}`;
 }
 
-function arrayToCSV(data) {
-    const headers = Object.keys(data[0]).concat(Object.keys(data[0].tL[0]));
-    const rows = data.map(item =>
-        headers.map(header =>
-        header in item ? item[header] : item.tL.map(tLItem => tLItem[header]).join(';')
-        ).join(',')
-    );
-    return headers.join(',') + '\n' + rows.join('\n');
+function downloadTableAsCSV(filename) {
+    const rows = [];
+
+    // Get header data
+    const headers = Array.from(document.querySelectorAll('#data-table thead th')).map(th => th.innerText);
+    rows.push(headers.join(', ,')); // Add header row
+
+    // Get cell data
+    const dataRows = Array.from(document.querySelectorAll('#body-row tr'));
+    dataRows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
+        rows.push(cells.join(',')); // Add cell values joined by commas
+    });
+
+    // Create CSV content
+    const csvContent = rows.join('\n');
+
+    // Create a blob and trigger the download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+  
+    document.body.appendChild(link); // Append link to body
+    link.click(); // Trigger the download
+    document.body.removeChild(link); // Remove link from body
 }
 
-function downloadCSV() {
-    const csv = arrayToCSV(timeLines);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const filename = prompt('Enter filename:');
-    if (filename !== null) {
-        a.href = url;
-        a.download = `${filename}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+// Example: Using the function with a button click event
+document.getElementById("downloadButton").onclick = function() {
+    const filename = prompt("Enter the file name (without .csv extension):", "data");
+    if (filename) {
+        downloadTableAsCSV(filename + '.csv'); // Append .csv extension
     }
-}
+};
 
 // Main function to plot the sundial
 
@@ -318,49 +329,46 @@ function readValues() {
 
     // Display the time Lines Data for each point on the dial.
     
-    var tableBody = document.getElementById('data-table').getElementsByTagName('header-row')[0];
-        // tableBody.innerHTML = ''
-    var tableBody = document.getElementById('data-table').getElementsByTagName('body-row')[0];
-        // tableBody.innerHTML = ''
-    headerRow = document.getElementById('header-row');
-    bodyRow = document.getElementById('body-row');
+    const headerRow = document.querySelector('#data-table thead tr');
+    const bodyRow = document.getElementById('body-row');
 
-    // Loop through timeLines to create dynamic headers and data rows
+    // Step 1: Create time headers directly without extra empty cell
     timeLines.forEach(timeline => {
-        const time = timeline.time;
-
-        // Add a header for the current time if there's data
-        if (timeline.tL.length > 0) {
-            const headerCell = document.createElement('th');
-            headerCell.textContent = `${timeHM(time)}`;
-            headerRow.appendChild(headerCell);
-
-            // Create a row for the values under this time column
-            const dataCell = document.createElement('td');
-            dataCell.textContent = `DEC, X, Y`;
-            // Create inner rows for dec, x, y values
-            timeline.tL.forEach(tl => {
-                const innerRow = document.createElement('tr');  
-                // Adding values to the corresponding inner row
-                const decCell = document.createElement('td');
-                decCell.textContent = tl.dec;
-                innerRow.appendChild(decCell);
-
-                const xCell = document.createElement('td');
-                xCell.textContent = tl.x;
-                innerRow.appendChild(xCell);
-
-                const yCell = document.createElement('td');
-                yCell.textContent = tl.y;
-                innerRow.appendChild(yCell);
-
-                dataCell.appendChild(innerRow);
-            });
-
-            // Append the corresponding data cell into the body
-            bodyRow.appendChild(dataCell);
-        }
+        const timeHeader = document.createElement('th');
+        timeHeader.textContent = timeline.time; // Add time value as header
+        headerRow.appendChild(timeHeader); // Append to header row
     });
+
+    // Step 2: Create a Set to hold unique dec values for row headers
+    const rowDecs = new Set();
+    timeLines.forEach(timeline => {
+        timeline.tL.forEach(tl => {
+            rowDecs.add(tl.dec); // Collect unique declination values
+        });
+    });
+
+    // Convert Set to Array for Iteration
+    const rowDecArray = Array.from(rowDecs).sort((a, b) => b - a); // Sort in descending order
+
+    // Step 3: Create rows for each dec value
+    rowDecArray.forEach(dec => {
+        const row = bodyRow.insertRow(); // Create a new row for each dec
+        const rowHeaderCell = row.insertCell(0); // Create first cell for the row header
+        rowHeaderCell.textContent = dec; // Set the dec value as the row header
+        rowHeaderCell.className = 'row-header'; // Add class for bold formatting
+
+        timeLines.forEach(timeline => {
+            const tlData = timeline.tL.find(tl => tl.dec === dec); // Find matching data for this dec
+            const cell = row.insertCell(); // Create a new cell for each time
+
+            if (tlData) {
+                cell.textContent = `${tlData.x}, ${tlData.y}`; // Display the coordinates
+            } else {
+                cell.textContent = ''; // No matching data for this cell
+            }
+        });
+    });
+    
     
     // Draw the dial   
 

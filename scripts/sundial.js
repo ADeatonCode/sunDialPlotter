@@ -197,8 +197,14 @@ function readValues() {
     
     var dialOrientation = "";
 
-    const location = document.getElementById('location').value;
+    const locName = document.getElementById('locName')?.value || '';
+    const address = document.getElementById('address')?.value || '';
+    const city = document.getElementById('city')?.value || '';
+    const state = document.getElementById('state')?.value || '';
+    const zip = document.getElementById('zip')?.value || '';
+    const location = [locName, address, city, state, zip].filter(Boolean).join(', ');
     const lat = parseFloat(document.getElementById('lat').value);
+    const lng = parseFloat(document.getElementById('lng')?.value || NaN);
     const description = document.getElementById('description').value; 
     const verticalDial = document.getElementById('verticalDial').checked;
     const horizontalDial = document.getElementById('horizontalDial').checked;

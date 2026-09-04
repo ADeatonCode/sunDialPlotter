@@ -191,6 +191,142 @@ document.getElementById("downloadButton").onclick = function() {
     }
 };
 
+// Collect all form/settings values into a plain object
+function collectSettings() {
+    const locName = document.getElementById('locName')?.value || '';
+    const address = document.getElementById('address')?.value || '';
+    const city = document.getElementById('city')?.value || '';
+    const state = document.getElementById('state')?.value || '';
+    const zip = document.getElementById('zip')?.value || '';
+    const latitude = parseFloat(document.getElementById('lat')?.value || NaN);
+    const longitude = parseFloat(document.getElementById('lng')?.value || NaN);
+    const description = document.getElementById('description')?.value || '';
+    const verticalDial = document.getElementById('verticalDial')?.checked || false;
+    const horizontalDial = document.getElementById('horizontalDial')?.checked || false;
+    const frontView = document.getElementById('frontView')?.checked || false;
+    const backView = document.getElementById('backView')?.checked || false;
+    const alpha = parseFloat(document.getElementById('alpha')?.value || NaN);
+    const beta = parseFloat(document.getElementById('beta')?.value || NaN);
+    const tau = parseFloat(document.getElementById('tau')?.value || NaN);
+    const omega = parseFloat(document.getElementById('omega')?.value || NaN);
+    const timeInterval = parseFloat(document.getElementById('timeInterval')?.value || NaN);
+    const dialHeight = parseFloat(document.getElementById('dialHeight')?.value || NaN);
+    const dialWidth = parseFloat(document.getElementById('dialWidth')?.value || NaN);
+
+    return {
+        locName,
+        address,
+        city,
+        state,
+        zip,
+        latitude,
+        longitude,
+        description,
+        dialType: verticalDial ? 'vertical' : (horizontalDial ? 'horizontal' : ''),
+        faceView: frontView ? 'front' : (backView ? 'back' : ''),
+        alpha,
+        beta,
+        tau,
+        omega,
+        timeInterval,
+        dialHeight,
+        dialWidth,
+        exportedAt: new Date().toISOString()
+    };
+}
+
+// Save settings as a .gss file (JSON). Default filename is the location name.
+function saveSettings() {
+    const settings = collectSettings();
+    const json = JSON.stringify(settings, null, 2);
+    // sanitize file name
+    const baseName = (settings.locName || 'sundial').trim().replace(/[\\/:*?"<>|]/g, '_') || 'sundial';
+    const fileName = baseName + '.gss';
+
+    const blob = new Blob([json], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
+
+// Wire save button
+const saveBtn = document.getElementById('saveButton');
+if (saveBtn) {
+    saveBtn.addEventListener('click', saveSettings);
+}
+
+// Load settings from a .gss file and populate the form
+function loadSettings() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.gss,application/json';
+    input.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const text = reader.result;
+                const settings = JSON.parse(text);
+                // Populate fields if present in the file
+                if (settings.locName !== undefined) document.getElementById('locName').value = settings.locName;
+                if (settings.address !== undefined) document.getElementById('address').value = settings.address;
+                if (settings.city !== undefined) document.getElementById('city').value = settings.city;
+                if (settings.state !== undefined) document.getElementById('state').value = settings.state;
+                if (settings.zip !== undefined) document.getElementById('zip').value = settings.zip;
+                if (settings.latitude !== undefined && !isNaN(settings.latitude)) document.getElementById('lat').value = settings.latitude;
+                if (settings.longitude !== undefined && !isNaN(settings.longitude)) document.getElementById('lng').value = settings.longitude;
+                if (settings.description !== undefined) document.getElementById('description').value = settings.description;
+                // Dial type
+                if (settings.dialType === 'vertical') {
+                    document.getElementById('verticalDial').checked = true;
+                    document.getElementById('horizontalDial').checked = false;
+                } else if (settings.dialType === 'horizontal') {
+                    document.getElementById('horizontalDial').checked = true;
+                    document.getElementById('verticalDial').checked = false;
+                }
+                // Face view
+                if (settings.faceView === 'front') {
+                    document.getElementById('frontView').checked = true;
+                    document.getElementById('backView').checked = false;
+                } else if (settings.faceView === 'back') {
+                    document.getElementById('backView').checked = true;
+                    document.getElementById('frontView').checked = false;
+                }
+                // Numeric settings
+                if (settings.alpha !== undefined && !isNaN(settings.alpha)) document.getElementById('alpha').value = settings.alpha;
+                if (settings.beta !== undefined && !isNaN(settings.beta)) document.getElementById('beta').value = settings.beta;
+                if (settings.tau !== undefined && !isNaN(settings.tau)) document.getElementById('tau').value = settings.tau;
+                if (settings.omega !== undefined && !isNaN(settings.omega)) document.getElementById('omega').value = settings.omega;
+                if (settings.timeInterval !== undefined && !isNaN(settings.timeInterval)) document.getElementById('timeInterval').value = settings.timeInterval;
+                if (settings.dialHeight !== undefined && !isNaN(settings.dialHeight)) document.getElementById('dialHeight').value = settings.dialHeight;
+                if (settings.dialWidth !== undefined && !isNaN(settings.dialWidth)) document.getElementById('dialWidth').value = settings.dialWidth;
+
+                alert('Settings loaded.');
+            } catch (err) {
+                console.error(err);
+                alert('Failed to load settings: ' + err.message);
+            }
+        };
+        reader.onerror = () => {
+            alert('Error reading file');
+        };
+        reader.readAsText(file);
+    };
+    // Trigger file picker
+    input.click();
+}
+
+// Wire load button
+const loadBtn = document.getElementById('loadButton');
+if (loadBtn) {
+    loadBtn.addEventListener('click', loadSettings);
+}
+
 // Main function to plot the sundial
 
 function readValues() {

@@ -365,6 +365,22 @@ function readValues() {
     } else if (backView === true) {
         xSign = -1
     }
+
+    // Reset table and plotting state so repeated submits don't append
+    const headerRowElement = document.querySelector('#data-table thead tr');
+    if (headerRowElement) {
+        headerRowElement.innerHTML = '<th>Dec/Time</th>';
+    }
+    const bodyRowElement = document.getElementById('body-row');
+    if (bodyRowElement) {
+        bodyRowElement.innerHTML = '';
+    }
+    // Reset timeLines and extrema used for plotting
+    timeLines = [];
+    xMax = -Infinity;
+    yMax = -Infinity;
+    xMin = Infinity;
+    yMin = Infinity;
     
     // create sundial table
 

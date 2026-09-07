@@ -26,8 +26,8 @@
 
                     <div class="coords-column">
                         <label>Coordinates:</label>
-                        <input type="number" id="lat" name="coordinates" step="any" value="Latitude" placeholder="Latitude">
-                        <input type="number" id="lng" name="longitude" step="any" value="Longitude" placeholder="Longitude">
+                        <input type="number" id="lat" name="coordinates" step="any" placeholder="Latitude">
+                        <input type="number" id="lng" name="longitude" step="any" placeholder="Longitude">
                     </div>
                 </div>
                 <br>
@@ -53,12 +53,12 @@
                 </div>
                 <br>
                 <div class="specification-row">
-                    <label for="alpha">Gnomon Distance:</label>
+                    <label for="alpha">Gnomon Tip Perpendicular Distance to Dial:</label>
                     <input type="number" id="alpha" name="alpha" step="any" value="6.4568"><br><br>
         
-                    <label for="beta">Gnomon length:</label>  
+                    <label for="beta">Gnomon length (From top of dial to origin):</label>  
                     <input type="number" id="beta" name="beta" step="any" value="5"><br><br>
-                    <label for="tau">tilt:</label>
+                    <label for="tau">Tilt:</label>
                     <input type="number" id="tau" name="tau" step="any" value="0"><br><br>
         
                     <label for="omega">Dial direction:</label>
@@ -74,13 +74,24 @@
                 
                     <label for="dialWidth">Dial Width:</label>
                     <input type="number" id="dialWidth" name="dialSize" step="1" value="12">
-                    <br><br>
+
+                    <div class="calc-col">
+                        <div>
+                            <input type="radio" id="sphericalCalc" name="calcMethod" value="spherical" checked>
+                            <label for="sphericalCalc">Spherical</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="vectorRayPlaneCalc" name="calcMethod" value="vectorRayPlane">
+                            <label for="vectorRayPlaneCalc">Vector Ray-plane</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="buttonContainer">
                     <button type="button" onclick="readValues()">Submit</button>
                     <button type="button" id="loadButton">Load</button>
                     <button type="button" id="saveButton">Save</button>
+                    <button type="button" id="compareButton">Compare Methods</button>
                 </div>  
             </div>
         </form>
@@ -103,8 +114,19 @@
         </div>
         <hr />
         <h2 id="dialPlotTitle">Dial Plot</h2>
-        <div class="canvas-container">
-            <canvas id="sundialCanvas" width="400" height="400"></canvas>
+        <div class="canvas-wrapper">
+            <div class="canvas-side-info">
+                <span id="sideTiltLabel">Tilt: 0°</span>
+            </div>
+            <div class="canvas-main-area">
+                <canvas id="sundialCanvas" width="400" height="400"></canvas>
+                <div class="canvas-bottom-info">
+                    <p id="facingText">Facing Direction: <span id="facingValue">112.5°</span></p>
+                    <svg width="24" height="32" viewBox="0 0 24 32" class="thick-arrow-svg">
+                        <path d="M 9 0 L 15 0 L 15 18 L 23 18 L 12 32 L 1 18 L 9 18 Z" fill="#333" />
+                    </svg>
+                </div>
+            </div>
         </div>
         <script src="scripts/sundial.js"></script>
     </body>

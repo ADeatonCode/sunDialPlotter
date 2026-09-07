@@ -94,19 +94,27 @@ function hAC(fhC) {
 // Sundial Plotting Functions //
 
 function xVR(a,t,theta,phi) {
-    return a*cos(theta)*sin(phi)/(sin(theta)*sin(t)+cos(theta)*cos(phi)*cos(t));
+    const denom = sin(theta)*sin(t)+cos(theta)*cos(phi)*cos(t);
+    if (Math.abs(denom) < 1e-12) return NaN;
+    return a*cos(theta)*sin(phi)/denom;
 }
 
 function yVR(a,t,theta,phi) {
-    return a*tan(t)-a*sin(theta)/((sin(theta)*sin(t)+cos(theta)*cos(phi)*cos(t))*cos(t));
+    const denom = (sin(theta)*sin(t)+cos(theta)*cos(phi)*cos(t))*cos(t);
+    if (Math.abs(denom) < 1e-12) return NaN;
+    return a*tan(t)-a*sin(theta)/denom;
 }
 
 function xHR(a,t,theta,phi) {
-    return a*cos(theta)*sin(phi)/(sin(theta)*cos(t)+cos(theta)*cos(phi)*sin(t));
+    const denom = sin(theta)*cos(t)+cos(theta)*cos(phi)*sin(t);
+    if (Math.abs(denom) < 1e-12) return NaN;
+    return a*cos(theta)*sin(phi)/denom;
 }
 
 function yHR(a,t,theta,phi) {
-    return a*cos(theta)*cos(phi)/((sin(theta)*cos(t)+cos(theta)*cos(phi)*sin(t))*cos(t))-a*tan(t);
+    const denom = (sin(theta)*cos(t)+cos(theta)*cos(phi)*sin(t))*cos(t);
+    if (Math.abs(denom) < 1e-12) return NaN;
+    return a*cos(theta)*cos(phi)/denom-a*tan(t);
 }
 
 function getDayOfYear(date) {
@@ -212,6 +220,8 @@ function collectSettings() {
     const timeInterval = parseFloat(document.getElementById('timeInterval')?.value || NaN);
     const dialHeight = parseFloat(document.getElementById('dialHeight')?.value || NaN);
     const dialWidth = parseFloat(document.getElementById('dialWidth')?.value || NaN);
+    const sphericalCalc = document.getElementById('sphericalCalc')?.checked ?? true;
+    const vectorRayPlaneCalc = document.getElementById('vectorRayPlaneCalc')?.checked ?? false;
 
     return {
         locName,
@@ -231,22 +241,136 @@ function collectSettings() {
         timeInterval,
         dialHeight,
         dialWidth,
+        sphericalCalc,
+        vectorRayPlaneCalc,
         exportedAt: new Date().toISOString()
     };
 }
 
 // Save settings as a .gss file (JSON). Default filename is the location name.
-function saveSettings() {
+async function saveSettings() {
     const settings = collectSettings();
     const json = JSON.stringify(settings, null, 2);
     // sanitize file name
     const baseName = (settings.locName || 'sundial').trim().replace(/[\\/:*?"<>|]/g, '_') || 'sundial';
     const fileName = baseName + '.gss';
+    console.log('saveSettings: showSaveFilePicker=', !!window.showSaveFilePicker, ' showDirectoryPicker=', !!window.showDirectoryPicker, 'userAgent=', navigator.userAgent);
 
+    // If browser does not support File System Access API, offer two explicit choices:
+    // - Copy JSON to clipboard (user will paste into a file manually)
+    // - Enter a filename and download the .gss file (browser download/save-as)
+    if (!window.showSaveFilePicker && !window.showDirectoryPicker) {
+        const msg = 'Native file-save APIs are not available in this browser.\n\n' +
+            'Choose OK to copy the settings JSON to the clipboard (you can paste into a file and save it).\n' +
+            'Choose Cancel to enter a filename and download the .gss file instead.';
+
+        const wantCopy = confirm(msg);
+        if (wantCopy) {
+            // Try clipboard first
+            if (navigator.clipboard) {
+                try {
+                    await navigator.clipboard.writeText(json);
+                    alert('Settings JSON copied to clipboard. Paste into a file and save with .gss extension.');
+                    return;
+                } catch (err) {
+                    console.error('clipboard write failed', err);
+                    const tryDownload = confirm('Clipboard copy failed. Do you want to download the file as a fallback?');
+                    if (!tryDownload) {
+                        alert('Save aborted. No file was written.');
+                        return;
+                    }
+                    // else fall through to do a download below
+                }
+            } else {
+                const tryDownload = confirm('Clipboard not available. Do you want to download the file instead?');
+                if (!tryDownload) {
+                    alert('Save aborted. No file was written.');
+                    return;
+                }
+                // else fall through to do a download below
+            }
+        } else {
+            // User chose download path: prompt for filename and download
+            const fallbackName = prompt('Enter filename to save (without extension):', baseName);
+            if (fallbackName === null) {
+                alert('Save aborted. No file was written.');
+                return;
+            }
+            const finalName = fallbackName.endsWith('.gss') ? fallbackName : (fallbackName + '.gss');
+            const blob = new Blob([json], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = finalName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            return;
+        }
+    }
+
+    // Prefer native Save File Picker when available (Chromium-based browsers)
+    if (window.showSaveFilePicker) {
+        try {
+            const opts = {
+                suggestedName: fileName,
+                types: [
+                    {
+                        description: 'Gnomonic Sundial Settings',
+                        accept: { 'application/json': ['.gss', '.json'] }
+                    }
+                ]
+            };
+            const handle = await window.showSaveFilePicker(opts);
+            const writable = await handle.createWritable();
+            await writable.write(json);
+            await writable.close();
+            alert('Settings saved.');
+            return;
+        } catch (err) {
+            console.error('Save failed using showSaveFilePicker:', err);
+            // If user cancelled the native file picker, don't fall back automatically
+            if (err && (err.name === 'AbortError' || err.name === 'NotAllowedError')) {
+                alert('Save cancelled. No file was written.');
+                return;
+            }
+            const tryFallback = confirm('Save failed: ' + (err && err.message ? err.message : String(err)) + '\nDo you want to try a fallback method (download)?');
+            if (!tryFallback) return;
+            // else fall through to directory picker / download fallback
+        }
+    }
+    // If showSaveFilePicker isn't available, try showDirectoryPicker (select folder) when supported
+    if (window.showDirectoryPicker) {
+        try {
+            const dirHandle = await window.showDirectoryPicker();
+            const fallbackName = prompt('Enter filename to save (without extension):', baseName) || baseName;
+            const finalName = fallbackName.endsWith('.gss') ? fallbackName : (fallbackName + '.gss');
+            const fileHandle = await dirHandle.getFileHandle(finalName, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(json);
+            await writable.close();
+            alert('Settings saved.');
+            return;
+        } catch (err) {
+            console.error('Save using showDirectoryPicker failed:', err);
+            if (err && (err.name === 'AbortError' || err.name === 'NotAllowedError')) {
+                alert('Save cancelled. No file was written.');
+                return;
+            }
+            const tryFallback = confirm('Save failed: ' + (err && err.message ? err.message : String(err)) + '\nDo you want to try a fallback method (download)?');
+            if (!tryFallback) return;
+            // else fall through to download fallback
+        }
+    }
+
+    // Final fallback: trigger browser download (user chooses folder via browser settings)
+    // Ask for a filename so the browser Save As dialog shows the desired name
+    const fallbackName = prompt('Enter filename to save (without extension):', baseName) || baseName;
+    const finalName = fallbackName.endsWith('.gss') ? fallbackName : (fallbackName + '.gss');
     const blob = new Blob([json], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = fileName;
+    link.download = finalName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -278,8 +402,23 @@ function loadSettings() {
                 if (settings.city !== undefined) document.getElementById('city').value = settings.city;
                 if (settings.state !== undefined) document.getElementById('state').value = settings.state;
                 if (settings.zip !== undefined) document.getElementById('zip').value = settings.zip;
-                if (settings.latitude !== undefined && !isNaN(settings.latitude)) document.getElementById('lat').value = settings.latitude;
-                if (settings.longitude !== undefined && !isNaN(settings.longitude)) document.getElementById('lng').value = settings.longitude;
+                if (settings.latitude !== undefined) {
+                    const latNum = Number(settings.latitude);
+                    if (Number.isFinite(latNum)) {
+                        document.getElementById('lat').value = latNum;
+                    } else {
+                        // invalid value in file, clear field to avoid input type=number parse errors
+                        document.getElementById('lat').value = '';
+                    }
+                }
+                if (settings.longitude !== undefined) {
+                    const lngNum = Number(settings.longitude);
+                    if (Number.isFinite(lngNum)) {
+                        document.getElementById('lng').value = lngNum;
+                    } else {
+                        document.getElementById('lng').value = '';
+                    }
+                }
                 if (settings.description !== undefined) document.getElementById('description').value = settings.description;
                 // Dial type
                 if (settings.dialType === 'vertical') {
@@ -298,13 +437,18 @@ function loadSettings() {
                     document.getElementById('frontView').checked = false;
                 }
                 // Numeric settings
-                if (settings.alpha !== undefined && !isNaN(settings.alpha)) document.getElementById('alpha').value = settings.alpha;
-                if (settings.beta !== undefined && !isNaN(settings.beta)) document.getElementById('beta').value = settings.beta;
-                if (settings.tau !== undefined && !isNaN(settings.tau)) document.getElementById('tau').value = settings.tau;
-                if (settings.omega !== undefined && !isNaN(settings.omega)) document.getElementById('omega').value = settings.omega;
-                if (settings.timeInterval !== undefined && !isNaN(settings.timeInterval)) document.getElementById('timeInterval').value = settings.timeInterval;
-                if (settings.dialHeight !== undefined && !isNaN(settings.dialHeight)) document.getElementById('dialHeight').value = settings.dialHeight;
-                if (settings.dialWidth !== undefined && !isNaN(settings.dialWidth)) document.getElementById('dialWidth').value = settings.dialWidth;
+                if (settings.alpha !== undefined && !isNaN(settings.alpha)) document.getElementById('alpha').value = settings.alpha; //gnomon distance
+                if (settings.beta !== undefined && !isNaN(settings.beta)) document.getElementById('beta').value = settings.beta; //gnomon height
+                if (settings.tau !== undefined && !isNaN(settings.tau)) document.getElementById('tau').value = settings.tau;  //dial tilt
+                if (settings.omega !== undefined && !isNaN(settings.omega)) document.getElementById('omega').value = settings.omega;  //dial direction
+                if (settings.timeInterval !== undefined && !isNaN(settings.timeInterval)) document.getElementById('timeInterval').value = settings.timeInterval;  //time interval
+                if (settings.dialHeight !== undefined && !isNaN(settings.dialHeight)) document.getElementById('dialHeight').value = settings.dialHeight;  //dial height
+                if (settings.dialWidth !== undefined && !isNaN(settings.dialWidth)) document.getElementById('dialWidth').value = settings.dialWidth;  //dial width
+                if (settings.sphericalCalc === true) {
+                    document.getElementById('sphericalCalc').checked = true;
+                } else if (settings.vectorRayPlaneCalc === true) {
+                    document.getElementById('vectorRayPlaneCalc').checked = true;
+                }
 
                 alert('Settings loaded.');
             } catch (err) {
@@ -325,6 +469,168 @@ function loadSettings() {
 const loadBtn = document.getElementById('loadButton');
 if (loadBtn) {
     loadBtn.addEventListener('click', loadSettings);
+}
+
+// Wire compare button
+const compareBtn = document.getElementById('compareButton');
+if (compareBtn) {
+    compareBtn.addEventListener('click', () => {
+        compareMethods();
+    });
+}
+
+// Ray-plane projection helper
+function projectRayPlane(lat, dec, lha, alpha, beta, tau, omega) {
+    // lat, dec, lha in degrees; alpha,beta,tau,omega degrees as used in UI
+    // compute sun altitude and azimuth (degrees) using existing functions
+    const hCdeg = hC(lat, dec, lha); // degrees
+    const ZnDeg = zN(lat, dec, lha, hCdeg);
+
+    const alt = hCdeg * Math.PI / 180;
+    const az = ZnDeg * Math.PI / 180;
+
+    // sun direction vector in ENU (east,north,up)
+    const sx = Math.cos(alt) * Math.sin(az);
+    const sy = Math.cos(alt) * Math.cos(az);
+    const sz = Math.sin(alt);
+    const s = [sx, sy, sz];
+
+    // plane normal from tau (tilt from vertical) and omega (bearing)
+    const tauRad = tau * Math.PI / 180;
+    const omegaRad = omega * Math.PI / 180;
+    let nx = Math.sin(tauRad) * Math.sin(omegaRad);
+    let ny = Math.sin(tauRad) * Math.cos(omegaRad);
+    let nz = Math.cos(tauRad);
+    // normalize
+    const nlen = Math.hypot(nx, ny, nz) || 1;
+    nx /= nlen; ny /= nlen; nz /= nlen;
+    const n = [nx, ny, nz];
+
+    // gnomon base g: use the provided 'alpha' (gnomon distance) as the ray origin height
+    // alpha is the distance used by the spherical formulas (xHR/yHR) so use it here
+    const g = [0, 0, alpha];
+
+    // plane origin p0 at (0,0,0)
+    const p0 = [0, 0, 0];
+
+    // denom = n · s
+    const denom = nx * sx + ny * sy + nz * sz;
+    const eps = 1e-12;
+    if (Math.abs(denom) < eps) {
+        return { x: NaN, y: NaN, visible: false, t: NaN };
+    }
+
+    const p0mgx = p0[0] - g[0];
+    const p0mgy = p0[1] - g[1];
+    const p0mgz = p0[2] - g[2];
+    const numer = nx * p0mgx + ny * p0mgy + nz * p0mgz;
+    const t = numer / denom;
+    const Px = g[0] + t * sx;
+    const Py = g[1] + t * sy;
+    const Pz = g[2] + t * sz;
+
+    // in-plane basis u = normalize(cross(up,n)), v = cross(n,u)
+    const up = [0, 0, 1];
+    let ux = up[1] * nz - up[2] * ny; // cross(up,n)
+    let uy = up[2] * nx - up[0] * nz;
+    let uz = up[0] * ny - up[1] * nx;
+    const ulen = Math.hypot(ux, uy, uz);
+    if (ulen < 1e-6) {
+        // n is nearly up; choose east as u
+        ux = 1; uy = 0; uz = 0;
+    } else {
+        ux /= ulen; uy /= ulen; uz /= ulen;
+    }
+    // v = cross(n,u)
+    const vx = ny * uz - nz * uy;
+    const vy = nz * ux - nx * uz;
+    const vz = nx * uy - ny * ux;
+
+    const dpx = Px - p0[0];
+    const dpy = Py - p0[1];
+    const dpz = Pz - p0[2];
+    const x = dpx * ux + dpy * uy + dpz * uz;
+    const y = dpx * vx + dpy * vy + dpz * vz;
+
+    // flip Y to match the sign convention used elsewhere (spherical formulas use -y in tables/plot)
+    return { x: x, y: -y, visible: true, t: t };
+}
+
+// Comparison routine: build table comparing existing spherical formulas values vs ray-plane
+function compareMethods() {
+    // collect and validate inputs (use collectSettings for consistency)
+    const s = collectSettings();
+    const lat = s.latitude;
+    const alpha = s.alpha;
+    const beta = s.beta;
+    const tau = s.tau;
+    const omega = s.omega;
+    const timeInterval = s.timeInterval;
+
+    // basic validation to avoid silent failures when inputs are missing or non-numeric
+    if (!Number.isFinite(lat)) {
+        alert('Please enter a valid numeric Latitude before comparing methods.');
+        return;
+    }
+    if (!Number.isFinite(timeInterval) || timeInterval <= 0) {
+        alert('Please enter a valid Time Interval (minutes) greater than zero.');
+        return;
+    }
+
+    // pick time range same as readValues would: compute sunrise lha using decSunRise heuristic
+    let decSunRise = lat < 0 ? -24 : 24;
+    const lhaSunrise = acs(-tan(lat) * tan(decSunRise));
+    const sunriseTime = lhaSunrise / 15;
+    const startTime = roundInterval(12 - sunriseTime, .25) + .25;
+    const endTime = roundInterval(sunriseTime + 12, .25) - .25;
+
+    // build table headers
+    const resultsDiv = document.getElementById('results');
+    const table = document.createElement('table');
+    table.border = 1;
+    const thead = table.createTHead();
+    const hrow = thead.insertRow();
+    ['Time','Dec','Spherical X','Spherical Y','RayPlane X','RayPlane Y','dX','dY'].forEach(h => { const th = document.createElement('th'); th.innerText = h; hrow.appendChild(th); });
+    const tbody = table.createTBody();
+
+    for (let t = startTime; t <= endTime + 1e-9; t += timeInterval / 60) {
+        const lhaT = (t - 12) * 15;
+        for (let decT = -24; decT <= 24; decT += 6) {
+            // spherical projection using existing horizontal formula for comparison
+            // compute hhC, zzN, hhAC as in main loop
+            const hhC = hC(lat, decT, lhaT);
+            const zzN = zN(lat, decT, lhaT, hhC);
+            const hhAC = hAC(hhC);
+            const phi = zzN - omega;
+            const theta = hhAC;
+
+            // spherical method: choose horizontal formula xHR/yHR
+            let sx = xHR(alpha, tau, theta, phi);
+            let sy = -yHR(alpha, tau, theta, phi);
+
+            // ray-plane method
+            const rp = projectRayPlane(lat, decT, lhaT, alpha, beta, tau, omega);
+
+            const row = tbody.insertRow();
+            function addCell(text){ const c = row.insertCell(); c.innerText = (text===undefined?'':text); }
+            addCell(timeHM(t));
+            addCell(decT);
+            addCell(isFinite(sx)?sx.toFixed(4):'');
+            addCell(isFinite(sy)?sy.toFixed(4):'');
+            if (rp.visible) {
+                addCell(rp.x.toFixed(4));
+                addCell(rp.y.toFixed(4));
+                addCell((sx - rp.x).toFixed(4));
+                addCell((sy - rp.y).toFixed(4));
+            } else {
+                addCell(''); addCell(''); addCell(''); addCell('');
+            }
+        }
+    }
+
+    // show table in results area
+    resultsDiv.innerHTML = '<h2>Method Comparison (spherical vs ray-plane)</h2>';
+    resultsDiv.appendChild(table);
 }
 
 // Main function to plot the sundial
@@ -353,6 +659,8 @@ function readValues() {
     const timeInterval = parseFloat(document.getElementById('timeInterval').value);
     const dialHeight = parseFloat(document.getElementById('dialHeight').value);
     const dialWidth = parseFloat(document.getElementById('dialWidth').value);
+    const sphericalCalc = document.getElementById('sphericalCalc')?.checked ?? true;
+    const vectorRayPlaneCalc = document.getElementById('vectorRayPlaneCalc')?.checked ?? false;
 
     if (verticalDial === true) {
         dialOrientation = "vertical";
@@ -402,6 +710,8 @@ function readValues() {
     let startTime = roundInterval(12 -sunriseTime, .25)+.25;
     let endTime = roundInterval(sunriseTime + 12, .25)-.25;
 
+    const calcMethodName = sphericalCalc ? "Spherical Method" : "Vector Ray-Plane Method";
+
     document.getElementById('results').innerHTML = `
             <h2>Results Table</h2>
             <hr />
@@ -410,7 +720,7 @@ function readValues() {
             <p>Sunrise: ${startTime*100} hours.  Sunset: ${endTime*100} hours.</p>
             <p>Sunrise LHA: ${(startTime-12)*15}  Sunset LHA: ${(endTime-12)*15}</p>
             <hr>
-            <h3>Table for a ${dialOrientation} dial.</h3>
+            <h3>Table for a ${dialOrientation} dial (${calcMethodName}).</h3>
             <p>Dial Facing: ${omega} degrees.  Gnomon Distance: ${alpha}.  Dial tilt: ${tau} degrees`;
 
     // calculate the timelines for the current Latitude.
@@ -434,12 +744,23 @@ function readValues() {
             let phi = zzN-omega;
             let theta = hhAC;
 
-            if (dialOrientation === "vertical") {
-                xx = xVR(alpha,tau,theta,phi);
-                yy = -yVR(alpha,tau,theta,phi);
-            } else if (dialOrientation === "horizontal") {
-                xx = xHR(alpha,tau,theta,phi);
-                yy = -yHR(alpha,tau,theta,phi);
+            if (sphericalCalc) {
+                if (dialOrientation === "vertical") {
+                    xx = xVR(alpha, tau, theta, phi);
+                    yy = -yVR(alpha, tau, theta, phi);
+                } else if (dialOrientation === "horizontal") {
+                    xx = xHR(alpha, tau, theta, phi);
+                    yy = -yHR(alpha, tau, theta, phi);
+                }
+            } else if (vectorRayPlaneCalc) {
+                const rp = projectRayPlane(lat, decT, lhaT, alpha, beta, tau, omega);
+                if (rp.visible) {
+                    xx = rp.x;
+                    yy = rp.y;
+                } else {
+                    xx = NaN;
+                    yy = NaN;
+                }
             }
             
             if (backView === true) {
@@ -460,23 +781,22 @@ function readValues() {
             }
             cvt = canvas.width/dialWidth
 
-            if (theta>=0 && (phi>-90 && phi<90) ) {
-
+            if (!isNaN(xx) && !isNaN(yy) && isFinite(xx) && isFinite(yy)) {
                 timeLines[index].tL.push({dec: decT, theta: theta, phi: phi, x: xx, y: yy});
             
-                if (xMax< xx) { 
-                xMax = xx;   
+                if (xMax < xx) { 
+                    xMax = xx;   
                 }
 
                 if (yMax < yy) {
-                yMax = yy;
+                    yMax = yy;
                 }
 
-                if (xMin> xx) {
+                if (xMin > xx) {
                     xMin = xx;
                 }
 
-                if (yMin> yy) {
+                if (yMin > yy) {
                     yMin = yy;
                 }
             } 
@@ -493,7 +813,7 @@ function readValues() {
     // Step 1: Create time headers directly without extra empty cell
     timeLines.forEach(timeline => {
         const timeHeader = document.createElement('th');
-        timeHeader.textContent = timeline.time; // Add time value as header
+        timeHeader.textContent = timeHM(timeline.time); // Add formatted time value as header
         headerRow.appendChild(timeHeader); // Append to header row
     });
 
@@ -537,56 +857,97 @@ function readValues() {
     console.log(innerWidth,innerHeight);
     console.log(`cvt: ${cvt}`);
     
-    if (dialOrientation === "vertical") {
-        xOffset=canvas.width/2;
-        yOffset=beta * cvt;
-    } else if (dialOrientation === "horizontal") {
-        xOffset=canvas.width/2;
-        yOffset=canvas.height - beta* cvt;
-    }
-    console.log(`x offset: ${xOffset}, y offset: ${yOffset}`)
+    // Center origin (0,0) on the gnomon base at canvas center
+    xOffset = canvas.width / 2;
+    yOffset = canvas.height / 2;
+    console.log(`x offset: ${xOffset}, y offset: ${yOffset}`);
         
     console.log('plotting the dial');    
     
-    ctx.translate(xOffset,yOffset);
+    ctx.translate(xOffset, yOffset);
     
-    // Draw the origan.
-
+    // Draw the origin (0,0) crosshair
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 1;
-    if (yOffset === 0) {
-        ctx.moveTo(-1,1);
-        ctx.lineTo(0,0);
-        ctx.lineTo(1,1);
-    } else {
-        ctx.moveTo(-1,0)
-        ctx.lineTo(1,0);
-        ctx.moveTo(0,-1)
-        ctx.lineTo(0,1);
-    }
+    ctx.moveTo(-5, 0);
+    ctx.lineTo(5, 0);
+    ctx.moveTo(0, -5);
+    ctx.lineTo(0, 5);
     ctx.stroke();
 
     for (var i = 0; i < timeLines.length; i++) {
-        console.log(`${i}, time: ${timeLines[i].time}, Length: ${timeLines[i].tL.length}`)
-        
-        if (timeLines[i].tL.length>0) {
-
+        if (timeLines[i].tL.length > 0) {
             ctx.beginPath();
             ctx.strokeStyle = 'black';
-            ctx.lineWidth = 1;
-            
-            if (timeLines[i].time === int(timeLines[i].time)) {
-                ctx.lineWidth = 2;
+            let lw = Math.abs(timeLines[i].time - Math.round(timeLines[i].time)) < 1e-6 ? 2 : 1;
+            ctx.lineWidth = lw;
+
+            let isDrawing = false;
+            for (let j = 0; j < timeLines[i].tL.length; j++) {
+                const pt = timeLines[i].tL[j];
+                if (!isFinite(pt.x) || !isFinite(pt.y)) {
+                    isDrawing = false;
+                    continue;
+                }
+                const px = Math.round(pt.x * cvt);
+                const py = Math.round(pt.y * cvt);
+                if (!isDrawing) {
+                    ctx.moveTo(px, py);
+                    isDrawing = true;
+                } else {
+                    ctx.lineTo(px, py);
+                }
             }
-            
-            ctx.moveTo(int(timeLines[i].tL[0].x * cvt),int(timeLines[i].tL[0].y * cvt));
+            ctx.stroke();
         }
-        for(var j = 0; j <timeLines[i].tL.length; j++) {
-            
-            console.log(int(timeLines[i].tL[j].x * cvt),int(timeLines[i].tL[j].y * cvt));
-            ctx.lineTo(int(timeLines[i].tL[j].x * cvt),int(timeLines[i].tL[j].y * cvt));
+    }
+
+    // Draw equinox line (DEC = 0) using precomputed points from timeLines
+    (function drawEquinox() {
+        const equinoxPoints = [];
+        timeLines.forEach(timeline => {
+            timeline.tL.forEach(pt => {
+                if (pt.dec === 0) {
+                    equinoxPoints.push({ x: Math.round(pt.x * cvt), y: Math.round(pt.y * cvt), time: timeline.time });
+                }
+            });
+        });
+
+        if (equinoxPoints.length < 2) return; // nothing to draw
+
+        // Sort points by time so the line follows the chronological order
+        equinoxPoints.sort((a, b) => a.time - b.time);
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        if (ctx.setLineDash) ctx.setLineDash([6, 4]);
+        ctx.moveTo(equinoxPoints[0].x, equinoxPoints[0].y);
+        for (let k = 1; k < equinoxPoints.length; k++) {
+            ctx.lineTo(equinoxPoints[k].x, equinoxPoints[k].y);
         }
-    ctx.stroke();
-    }   
+        ctx.stroke();
+        if (ctx.setLineDash) ctx.setLineDash([]);
+
+        // Label the equinox line near its midpoint
+        try {
+            const mid = Math.floor(equinoxPoints.length / 2);
+            ctx.fillStyle = 'red';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Equinox (Dec=0)', equinoxPoints[mid].x + 6, equinoxPoints[mid].y - 6);
+        } catch (e) {
+            // ignore label errors
+        }
+    })();
+
+    // Update external reference info outside the canvas
+    const sideTiltElem = document.getElementById('sideTiltLabel');
+    if (sideTiltElem) {
+        sideTiltElem.textContent = `Tilt: ${tau}°`;
+    }
+    const facingValueElem = document.getElementById('facingValue');
+    if (facingValueElem) {
+        facingValueElem.textContent = `${omega}°`;
+    }
 }

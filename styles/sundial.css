@@ -58,6 +58,12 @@ h3 {
 .location-row > .location-column > label,
 .location-row > .coords-column > label {
     margin-left: 0;
+    font-weight: bold;
+}
+
+/* Make the placeholder text for location inputs bold */
+.location-fields input::placeholder {
+    font-weight: bold;
 }
 
 /* coords-wrapper removed; coordinates are now in the main .location-row */
@@ -89,6 +95,14 @@ textarea {
 .dialSize-row {
     display: flex;
     gap: 10px;
+    align-items: center;
+}
+
+.calc-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: 10px;
 }
 
 .buttonContainer {
@@ -159,6 +173,45 @@ textarea {
     display: flex;
     justify-content: center;  /* Center horizontally */
     align-items: center;      /* Center vertically */
+}
+
+.canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.canvas-side-info {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.canvas-main-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-bottom-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #333;
+}
+
+.canvas-bottom-info p {
+    margin: 5px 0;
+}
+
+.thick-arrow-svg {
+    margin-top: 4px;
 }
 
 #sundialCanvas { 

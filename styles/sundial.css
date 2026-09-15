@@ -2,131 +2,306 @@ body {
     background-color: #2222
 }
 
-h1 { 
+h1 {
     text-align: center;
 }
-#about { 
+
+#about {
     margin-top: 20px;
     text-align: center;
 }
 
-h2 { 
+h2 {
     text-align: center;
 }
 
-h3 { 
+h3 {
     text-align: center;
 }
+#locationContainer,
+#inputForm {
+    text-align: left;
+    margin-left: 0;
+}
+    #inputForm h2 {
+        text-align: left !important;
+        margin-left: 0;
+    }
 .location-row {
     display: flex;
     padding: 10px;
-    gap: 20px;
-    align-items: flex-start; /* ensure both columns align at top */
+    gap: 10px;
+    justify-content: flex-start;
 }
-.location-column {
+.location-row-left,
+.location-row-right {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.location-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.coords-column {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-    margin-left: auto; /* push coords to the far right within the row */
-}
-
-.location-fields input {
-    width: 440px; /* double length for location fields */
-    min-width: 28ch;
-    height: 34px;
-}
-
-.coords-column input {
-    width: 220px; /* keep coordinates at previous size */
-    min-width: 14ch;
-    height: 34px;
-}
-
-.location-row > .location-column > label,
-.location-row > .coords-column > label {
+    padding: 10px;
+    gap: 10px;
     margin-left: 0;
-    font-weight: bold;
+    width: 250px;
+}
+.location-row-left {
+    display: flex;
+    justify-content: flex-start !important;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: 0 !important;
+}
+.location-row-right {
+    display: flex;
+    padding: 5px 10px;
+    gap: 10px;
+    justify-content: flex-end !important;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    width: 100%
+}
+.location-row-left label,
+.location-row-right label {
+    margin-left: 0 !important;
+}
+.location-row-left label {
+    width: 140px;
+    flex-shrink: 0;
+    text-align:left;
+    margin-left: 0 !important;
+}
+.location-row-left input,
+.location-row-right input {
+    width: 250px;
+}
+    
+#location {
+    display: flex;
+    margin-left: 0;
+    margin-top: 10px;
+    text-align: left;
+    width: 25%;
 }
 
-/* Make the placeholder text for location inputs bold */
-.location-fields input::placeholder {
-    font-weight: bold;
+.coordinates {
+    display: flex;
+    margin-top: 10px;
+    margin-right: auto;
+    text-align: left;
+    width: 25%;
+}
+.top-form-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    width: 100%;
+}
+.top-form-layout .left-column {
+    display: flex;
+    flex-direction: column;
+}
+    .top-form-layout .right-column {
+        display: flex;
+        flex-direction: column;
+        flex: .95;
+        height: 100%;
+    }
+.right-colunm h2 {
+    text-align: left !important;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+.top-form-layout .right-column textarea {
+    width: 100%;
+    height: 332px;
+    min-height: 235px;
+    resize: vertical;
+}
+label {
+    margin-left.: auto;
 }
 
-/* coords-wrapper removed; coordinates are now in the main .location-row */
-
-.location-column {
-    flex: 1; /* allow location column to take remaining space */
-}
 .type-row {
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 25px;
+    gap: 30px;
 }
+
 textarea {
     width: 90%;
-
 }
-
 .type-col {
-    width: 10%;
-    align-items: center;
-    justify-content: center;
-    
-}
-
-.specification-row  {
+    flex: 1;
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+}
+.type-col h2 {
+    text-align: left !important;
+    width: 220;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+.radio-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 220px;
+    margin-bottom: 8px;
+}
+/* Master container holding all 6 configuration columns in a single row */
+.master-config-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 30px;
+    gap: 15px;
+    align-items: flex-start;
 }
 
+/* Individual column configuration */
+.config-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0; /* Prevents overflow */
+}
+/* Consistent heading style for every column */
+.config-col h2 {
+    text-align: left !important;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+    white-space: nowrap;
+}
+
+/* Radio option alignment for the type columns */
+.config-col .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    white-space: nowrap;
+}
+
+/* Field row holding label and number input for the spec columns */
+.config-col .spec-field {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+/* Streamlined label sizing to fit neatly within the 6-column layout */
+.config-col .spec-field label {
+    font-size: 0.85rem;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+/* Compact input sizing to match */
+.config-col .spec-field input {
+    width: 55px;
+    font-size: 0.85rem;
+    padding: 2px 4px;
+}
+
+/* Submit button centered cleanly below the entire master row */
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 35px;
+    clear: both;
+}
+
+    .buttonContainer button {
+        padding: 10px 30px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+/* Container for the 4-column specifications row */
+.specs-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 30px;
+    gap: 20px;
+    align-items:flex-start;
+}
+/* Individual spec column */
+.specs-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+/* Heading style for each spec column */
+.specs-col h2 {
+    text-align: left !important;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+/* Field row hoding label and number input */
+.spec-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+}
+/* Uniform label sizing for the spec fields */
+.spec-field label {
+    width: 130px;
+    text-align: left;
+    flex-shrink: 0;
+}
+/* Uniform input box sizing */
+.spec-field input {
+    flex: 1;
+    min-width: 0;
+    max-width: 90px;
+}
+/* Dial size row */
 .dialSize-row {
     display: flex;
     gap: 10px;
-    align-items: center;
 }
 
-.calc-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-left: 10px;
-}
-
-.buttonContainer {
-    display: flex;
-    justify-content: space-between; /* distribute buttons across the full width */
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
-    height: 30vh; /* preserve vertical centering area */
-    box-sizing: border-box;
-}
-
-.buttonContainer button {
+button {
+    margin-top: 10px;
     padding: 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
     cursor: pointer;
     border-radius: 5px;
-    width: 30%; /* three buttons -> roughly fill row with spacing */
+    width: 25%;
     height: 50px;
 }
 
-
+.buttonContainer {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-top: 35px;
+    clear: both;
+}
+.buttonContainer button{
+    padding: 10px 30px;
+    font-size: 1rem;
+    cursor: pointer;
+}
 #results {
     margin-top: 20px;
     text-align: center;
@@ -169,52 +344,14 @@ textarea {
     align-items: center;
     height: 30vh; /* Center vertically within the viewport */
 }
+
 .canvas-container {
     display: flex;
-    justify-content: center;  /* Center horizontally */
-    align-items: center;      /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
 }
 
-.canvas-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 15px;
-}
-
-.canvas-side-info {
-    font-weight: bold;
-    font-size: 16px;
-    color: #333;
-    white-space: nowrap;
-}
-
-.canvas-main-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.canvas-bottom-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 15px;
-    color: #333;
-}
-
-.canvas-bottom-info p {
-    margin: 5px 0;
-}
-
-.thick-arrow-svg {
-    margin-top: 4px;
-}
-
-#sundialCanvas { 
-    border : 1px solid black;
+#sundialCanvas {
+    border: 1px solid black;
     margin: 5px 5px;
 }

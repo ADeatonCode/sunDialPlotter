@@ -1,0 +1,20 @@
+{
+  "locName": "Casablanca Apartments",
+  "address": "981 Murfreesboro Pike, Apartment 252",
+  "city": "Nashville",
+  "state": "Tennessee",
+  "zip": "37217",
+  "latitude": 36.129093,
+  "longitude": -86.715396,
+  "description": "Casa Blanca court yard sundial plan",
+  "dialType": "vertical",
+  "faceView": "front",
+  "alpha": 1,
+  "beta": 1,
+  "tau": 0,
+  "omega": 133.5,
+  "timeInterval": 15,
+  "dialHeight": 12,
+  "dialWidth": 24,
+  "exportedAt": "2026-09-05T23:26:09.437Z"
+}

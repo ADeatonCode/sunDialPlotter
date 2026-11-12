@@ -1,0 +1,20 @@
+{
+  "locName": "Test Dial",
+  "address": "",
+  "city": "",
+  "state": "",
+  "zip": "",
+  "latitude": 35,
+  "longitude": -89,
+  "description": "",
+  "dialType": "vertical",
+  "faceView": "front",
+  "alpha": 10,
+  "beta": 5,
+  "tau": 0,
+  "omega": 180,
+  "timeInterval": 15,
+  "dialHeight": 28,
+  "dialWidth": 12,
+  "exportedAt": "2026-09-06T14:32:42.514Z"
+}

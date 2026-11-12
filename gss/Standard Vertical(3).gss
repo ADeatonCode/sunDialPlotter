@@ -1,0 +1,20 @@
+{
+  "locName": "Standard Vertical",
+  "address": "1440 Union Springs Rd",
+  "city": "Whiteville",
+  "state": "TN",
+  "zip": "37217",
+  "latitude": 35.1758,
+  "longitude": -89.1522,
+  "description": "For units F,G,H,I,and K, all units walls face the same.  The eastward walls face (112.5).  The other walls can be calculated by adding or subtracting 90 or 180 degrees respectively.\n\nJ unit is offset by 45 degrees.  Thus the walls can be calculated by adding or subtracting 45 or 135 respectively.  ",
+  "dialType": "vertical",
+  "faceView": "back",
+  "alpha": 5,
+  "beta": 3,
+  "tau": 30,
+  "omega": 180,
+  "timeInterval": 15,
+  "dialHeight": 20,
+  "dialWidth": 160,
+  "exportedAt": "2026-09-05T15:19:03.969Z"
+}

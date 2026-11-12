@@ -1,0 +1,22 @@
+{
+  "locName": "CASABLANCA_TEST_DIAL",
+  "address": "",
+  "city": "",
+  "state": "",
+  "zip": "",
+  "latitude": 36.129099,
+  "longitude": -86.715367,
+  "description": "36.129099°N 86.715367°W",
+  "dialType": "horizontal",
+  "faceView": "front",
+  "alpha": 5,
+  "beta": 50,
+  "tau": 0,
+  "omega": 112.5,
+  "timeInterval": 15,
+  "dialHeight": 100,
+  "dialWidth": 100,
+  "sphericalCalc": true,
+  "vectorRayPlaneCalc": false,
+  "exportedAt": "2026-09-08T17:45:24.958Z"
+}

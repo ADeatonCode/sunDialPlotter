@@ -1,0 +1,44 @@
+﻿@echo off
+REM Start an HTTPS static server on https://localhost:5500 using mkcert for locally-trusted certs.
+REM Place this batch file in the project root and run it.
+
+SETLOCAL
+cd /d "%~dp0"
+
+REM Create certs directory if needed
+if not exist certs (mkdir certs)
+
+REM Check for mkcert in PATH
+where mkcert >nul 2>&1
+if errorlevel 1 (
+  echo mkcert not found. Install mkcert and ensure it is in your PATH.
+  echo Recommended: choco install mkcert   (requires Chocolatey)
+  echo Or download from: https://github.com/FiloSottile/mkcert/releases
+  pause
+  exit /b 1
+)
+
+echo Ensuring mkcert local CA is installed (may prompt)...
+mkcert -install
+if errorlevel 1 (
+  echo mkcert -install failed. You may need to run a separate command or check permissions.
+  pause
+  exit /b 1
+)
+
+echo Generating localhost certificate and key in .\certs\ ...
+mkcert -key-file certs\localhost-key.pem -cert-file certs\localhost.pem localhost 127.0.0.1 ::1
+if errorlevel 1 (
+  echo mkcert failed to generate certificates.
+  pause
+  exit /b 1
+)
+
+echo Starting http-server with HTTPS on https://localhost:5500
+echo Press Ctrl+C in this window to stop the server.
+
+REM Start the HTTPS http-server (will auto-install http-server if missing)
+npx --yes http-server -S --cert certs/localhost.pem --key certs/localhost-key.pem -p 5500 -a localhost
+
+ENDLOCAL
+`

@@ -1,0 +1,22 @@
+{
+  "locName": "WCFA",
+  "address": "1440 Union Springs Rd",
+  "city": "Whiteville",
+  "state": "TN",
+  "zip": "37217",
+  "latitude": 35.29917,
+  "longitude": null,
+  "description": "",
+  "dialType": "vertical",
+  "faceView": "back",
+  "alpha": 6.4568,
+  "beta": 5,
+  "tau": 0,
+  "omega": 112.5,
+  "timeInterval": 15,
+  "dialHeight": 28,
+  "dialWidth": 12,
+  "sphericalCalc": true,
+  "vectorRayPlaneCalc": false,
+  "exportedAt": "2026-09-08T06:15:27.998Z"
+}

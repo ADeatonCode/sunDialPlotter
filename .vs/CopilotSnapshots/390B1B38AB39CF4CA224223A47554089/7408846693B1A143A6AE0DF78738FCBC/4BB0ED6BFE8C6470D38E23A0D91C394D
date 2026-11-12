@@ -1,0 +1,87 @@
+﻿@echo off
+REM Start an HTTPS static server on https://localhost:5500 using mkcert for locally-trusted certs.
+REM Place this batch file in the project root and run it.
+
+SETLOCAL
+cd /d "%~dp0"
+
+REM Create certs directory if needed
+if not exist certs (mkdir certs)
+
+REM Check for mkcert in PATH
+REM Locate mkcert: prefer 'where' result, fall back to common Chocolatey location
+set "MKCERT_PATH="
+for /f "usebackq tokens=*" %%i in (`where mkcert 2^>nul`) do set "MKCERT_PATH=%%i"
+if not defined MKCERT_PATH (
+  if exist "%ProgramData%\chocolatey\bin\mkcert.exe" (
+	set "MKCERT_PATH=%ProgramData%\chocolatey\bin\mkcert.exe"
+  )
+)
+if not defined MKCERT_PATH (
+  echo mkcert not found. Install mkcert and ensure it is in your PATH.
+  echo Recommended: choco install mkcert   (requires Chocolatey)
+  echo Or download from: https://github.com/FiloSottile/mkcert/releases
+  pause
+  exit /b 1
+)
+echo Using mkcert at: %MKCERT_PATH%
+
+echo Ensuring mkcert local CA is installed (may prompt)...
+"%MKCERT_PATH%" -install
+if errorlevel 1 (
+  echo mkcert -install failed. You may need to run a separate command or check permissions.
+  pause
+  exit /b 1
+)
+
+echo Generating localhost certificate and key in .\certs\ ...
+"%MKCERT_PATH%" -key-file certs\localhost-key.pem -cert-file certs\localhost.pem localhost 127.0.0.1 ::1
+if errorlevel 1 (
+  echo mkcert failed to generate certificates.
+  pause
+  exit /b 1
+)
+
+REM Report where the certificate and key were created (absolute paths)
+if exist "certs\localhost.pem" (
+	for %%F in ("certs\localhost.pem") do set "CERT_PEM=%%~fF"
+	echo Certificate created at: %CERT_PEM%
+) else (
+	echo WARNING: certs\localhost.pem not found after mkcert run.
+)
+
+if exist "certs\localhost-key.pem" (
+	for %%F in ("certs\localhost-key.pem") do set "CERT_KEY=%%~fF"
+	echo Private key created at: %CERT_KEY%
+) else (
+	echo WARNING: certs\localhost-key.pem not found after mkcert run.
+)
+
+REM Show certs directory listing for quick inspection
+echo Contents of %CD%\certs\ :
+dir /b /a:-d "%CD%\certs\"
+
+REM Show mkcert CA root location (useful to know where mkcert stores the local CA)
+for /f "usebackq delims=" %%R in ('"%MKCERT_PATH%" -CAROOT') do set "MKCERT_CAROOT=%%R"
+if defined MKCERT_CAROOT (
+	echo mkcert CA root directory: %MKCERT_CAROOT%
+	if exist "%MKCERT_CAROOT%\rootCA.pem" echo mkcert root CA file: %MKCERT_CAROOT%\rootCA.pem
+) else (
+	echo Could not determine mkcert CAROOT; run: %MKCERT_PATH% -CAROOT
+)
+
+echo Starting http-server with HTTPS on https://localhost:5500
+echo Press Ctrl+C in this window to stop the server.
+
+REM Start the HTTPS http-server (will auto-install http-server via npx if missing)
+REM Use cmd /c to invoke npx from a PowerShell-friendly context so PowerShell's execution policy
+REM does not try to run npx.ps1 and block execution. Calling cmd ensures the Node/npm npx.cmd
+REM wrapper is used instead.
+REM Use explicit relative cert paths (.\certs) so the command resolves correctly when run from
+REM the project root (matches the manual command that worked interactively).
+REM This will start the static server over HTTPS (mkcert-created certs) and make the site available at:
+REM   https://localhost:5500
+cmd /c "npx --yes http-server -S --cert .\certs\localhost.pem --key .\certs\localhost-key.pem -p 5500 -a localhost"
+
+ENDLOCAL
+`

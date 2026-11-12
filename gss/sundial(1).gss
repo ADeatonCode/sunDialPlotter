@@ -1,0 +1,20 @@
+{
+  "locName": "",
+  "address": "",
+  "city": "",
+  "state": "",
+  "zip": "",
+  "latitude": null,
+  "longitude": null,
+  "description": "",
+  "dialType": "vertical",
+  "faceView": "front",
+  "alpha": 6.4568,
+  "beta": 5,
+  "tau": 0,
+  "omega": 112.5,
+  "timeInterval": 15,
+  "dialHeight": 28,
+  "dialWidth": 12,
+  "exportedAt": "2026-09-05T15:29:37.708Z"
+}

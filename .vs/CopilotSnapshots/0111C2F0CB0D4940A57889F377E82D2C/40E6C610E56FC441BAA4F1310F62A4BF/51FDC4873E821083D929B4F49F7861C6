@@ -1,0 +1,153 @@
+﻿body {
+    background-color: #2222
+}
+
+h1 { 
+    text-align: center;
+}
+#about { 
+    margin-top: 20px;
+    text-align: center;
+}
+
+h2 { 
+    text-align: center;
+}
+
+h3 { 
+    text-align: center;
+}
+.location-row {
+    display: flex;
+    padding: 10px;
+    gap: 20px;
+}
+.location-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.location-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.coords-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.location-fields input,
+.coords-column input {
+    width: 220px; /* make inputs wide enough to hold at least 5 characters comfortably */
+    min-width: 14ch;
+    height: 34px;
+}
+
+.location-row > .location-column > label,
+.location-row > .coords-column > label {
+    margin-left: 0;
+}
+.type-row {
+    display: flex;
+    gap: 10px;
+}
+textarea {
+    width: 90%;
+
+}
+
+.type-col {
+    width: 10%;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.specification-row  {
+    display: flex;
+    gap: 10px;
+}
+
+.dialSize-row {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 25%;
+    height: 50px;
+
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30vh; /* Center vertically within the viewport */
+}
+
+
+#results {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.row {
+    display: flex;
+}
+
+.column {
+    flex: 25%;
+    padding: 10px;
+}
+
+.timeLineRow {
+    display: flex;
+    gap: 10px;
+}
+
+.timeLineColumn {
+    flex: 10%;
+    padding: 10px;
+}
+
+.downloadButton {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 25%;
+    height: 50px;
+}
+
+#downloadButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30vh; /* Center vertically within the viewport */
+}
+.canvas-container {
+    display: flex;
+    justify-content: center;  /* Center horizontally */
+    align-items: center;      /* Center vertically */
+}
+
+#sundialCanvas { 
+    border : 1px solid black;
+    margin: 5px 5px;
+}

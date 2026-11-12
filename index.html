@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  Sundial Plotter — the form page where you enter a place on Earth.
+  You type latitude, longitude, and other settings, then the script draws a sundial.
+  The drawing code lives in scripts/sundial.js and the look is in styles/sundial.css.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,7 +25,7 @@
                     <h2>Location Information</h2>
                     <div class="location-row-left">
                         <label for="locationName">Location Name:</label>
-                        <input type="text" id="locationName" name="locationName" value="Location Name">
+                        <input type="text" id="locationName" name="locationName" value="WCFA">
                     </div>
                     <div class="location-row-left">
                         <label for="address">Address:</label>
@@ -54,7 +59,7 @@
                 <!-- Right Column: Description -->
                 <div class="right-column">
                     <h2>Description</h2>
-                    <textarea id="description" name="description" placeholder="describe the dial you are plotting"></textarea>
+                    <textarea id="description" name="description" placeholder="Parchment dial with popsicle stick frame"></textarea>
                 </div>
 
             </div>
@@ -80,11 +85,11 @@
                 <div class="config-col">
                     <h2>Face Type</h2>
                     <div class="radio-option">
-                        <input type="radio" id="frontView" name="FaceType" value="Front" checked>
+                        <input type="radio" id="frontView" name="FaceType" value="Front">
                         <label for="frontView">Front View</label>
                     </div>
                     <div class="radio-option">
-                        <input type="radio" id="backView" name="FaceType" value="Back">
+                        <input type="radio" id="backView" name="FaceType" value="Back" checked>
                         <label for="backView">Back View (Translucent)</label>
                     </div>
                 </div>
@@ -120,7 +125,7 @@
                     <h2>Orientation</h2>
                     <div class="spec-field">
                         <label for="omega">Direction:</label>
-                        <input type="number" id="omega" name="omega" step="any" value="112.5">
+                        <input type="number" id="omega" name="omega" step="any" value="202.5">
                     </div>
                     <div class="spec-field">
                         <label for="tau">Tilt:</label>

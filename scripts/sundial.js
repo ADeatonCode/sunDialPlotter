@@ -4,8 +4,13 @@
 /*                                    */
 /* Copyright (c) 2024 by Alan Deaton  */
 /*                                    */
+/* What this file does (simple):      */
+/* - Reads the form (lat, lon, etc.)  */
+/* - Figures where the sun would be   */
+/* - Draws hour lines on the canvas   */
+/* - Lets you print or save the plot  */
+/*                                    */
 /**************************************/
-
 // Define global variables and objects
 
 var timeLines = [
@@ -32,50 +37,61 @@ var xSign = 0;
 
 // Basic Trig Functions 
 
+// Cosine of an angle in degrees (not radians).
 function cos(angle) {
     return Math.cos(angle * Math.PI / 180);
 }
 
+// Sine of an angle in degrees.
 function sin(angle) {
     return Math.sin(angle * Math.PI / 180);
 }
 
+// Cosine of an angle in degrees (not radians).
 function cos(angle) {
     return Math.cos(angle * Math.PI / 180);
 }
+// Tangent of an angle in degrees.
 function tan(angle) {
     return Math.tan(angle * Math.PI / 180);
 }
 
 // Basic Inverse Trig Functions
 
+// Inverse cosine, answer in degrees.
 function acs(xx) {
     return Math.acos(xx) * 180 / Math.PI;
 }
 
+// Inverse sine, answer in degrees.
 function asin(yy) {
     return Math.asin(yy) * 180 / Math.PI;
 }
 
+// Inverse tangent, answer in degrees.
 function atan(zz) {
     return Math.atan(zz) * 180 / Math.PI;
 }
 
 // Advanced Trig Functions
 
+// Cotangent helper.
 function cot(angle) {
     return 1 / (tan(angle));
 }
 
+// Secant helper.
 function sec(angle) {
     return 1 / (cos(angle));
 }
 
 // Celestial Navigation Functions
 
+// Height of the sun above the horizon (Hc).
 function hC(lat, dec, lha) {
     return asin(sin(lat) * sin(dec) + cos(lat) * cos(dec) * cos(lha));
 }
+// Compass direction to the sun (azimuth Zn).
 function zN(lat, dec, lha, hC) {
     let z = acs((sin(dec) - sin(lat) * sin(hC)) / (cos(lat) * cos(hC)));
     if (lha === 0) {
@@ -87,28 +103,34 @@ function zN(lat, dec, lha, hC) {
     return z;
 }
 
+// Adjusted height used when drawing the dial.
 function hAC(fhC) {
     let fHac = .0167 / tan(fhC + 8.62 / (fhC + 4.4)) + fhC;
     return fHac;
 }
 // Sundial Plotting Functions //
 
+// X position for a vertical sundial ray.
 function xVR(a, t, theta, phi) {
     return a * cos(theta) * sin(phi) / (sin(theta) * sin(t) + cos(theta) * cos(phi) * cos(t));
 }
 
+// Y position for a vertical sundial ray.
 function yVR(a, t, theta, phi) {
     return a * tan(t) - a * sin(theta) / ((sin(theta) * sin(t) + cos(theta) * cos(phi) * cos(t)) * cos(t));
 }
 
+// X position for a horizontal sundial ray.
 function xHR(a, t, theta, phi) {
     return a * cos(theta) * sin(phi) / (sin(theta) * cos(t) + cos(theta) * cos(phi) * sin(t));
 }
 
+// Y position for a horizontal sundial ray.
 function yHR(a, t, theta, phi) {
     return a * cos(theta) * cos(phi) / ((sin(theta) * cos(t) + cos(theta) * cos(phi) * sin(t)) * cos(t)) - a * tan(t);
 }
 
+// Day number in the year (1–365/366) for sun math.
 function getDayOfYear(date) {
 
     // Create a new date object for the first day of the year
@@ -127,19 +149,23 @@ function getDayOfYear(date) {
 
 // Other functions
 
+// Absolute value helper.
 function abs(num) {
     return Math.abs(num);
 }
 
+// Whole-number part of a value.
 function int(num) {
     return parseInt(num);
 }
 
+// Sign of a number: -1, 0, or 1.
 function sgn(num) {
     return Math.sign(num);
 }
 // Rounding interval function
 
+// Round a number to the nearest step size.
 function roundInterval(NumberToRound, Interval) {
     if (NumberToRound < 0) {
         return int(abs(NumberToRound) / Interval + .5) * Interval * -1;
@@ -148,12 +174,14 @@ function roundInterval(NumberToRound, Interval) {
     }
 }
 
+// Turn a decimal hour into h:mm text.
 function timeHM(time) {
     let hours = int(time);
     let minutes = int((time - hours) * 60);
     return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}`;
 }
 
+// Save the calculated table as a CSV file you can open in a spreadsheet.
 function downloadTableAsCSV(filename) {
     const rows = [];
 
@@ -193,10 +221,22 @@ document.getElementById("downloadButton").onclick = function () {
 
 // Main function to plot the sundial
 
+// Read every form field and store the numbers for drawing.
 function readValues() {
+    // Reset global data and tracking bounds
+    timeLines.length = 0; // Clear the timeLines array
+    // Define the physical plate boundaries explicitly based on your inputs
+    
+    //console.log(timeLines);
 
-    var dialOrientation = "";
+    // Delare and clear existiong table headers and rows from previous runs
 
+    const headerRow = document.querySelector('#data-table thead tr');
+    const bodyRow = document.getElementById('body-row');
+    if (headerRow) headerRow.innerHTML = '';
+    if (bodyRow) bodyRow.innerHTML = '';
+
+    // Grab input values
     const location = document.getElementById('locationName').value;
     const lat = parseFloat(document.getElementById('lat').value);
     const description = document.getElementById('description').value;
@@ -211,6 +251,19 @@ function readValues() {
     const timeInterval = parseFloat(document.getElementById('timeInterval').value);
     const dialHeight = parseFloat(document.getElementById('dialHeight').value);
     const dialWidth = parseFloat(document.getElementById('dialWidth').value);
+
+    // Reset global data and tracking bounds
+    timeLines.length = 0; // Clear the timeLines array
+    // Define the physical plate boundaries explicitly based on your inputs
+    /*let halfWidth = dialWidth / 2;
+    let xMin = -halfWidth;
+    let xMax = halfWidth;
+    let yMin = -beta;
+    let yMax = dialHeight - beta;
+    */
+    console.log('xMin: ' + xMin + ', xMax: ' + xMax + ', yMin: ' + yMin + ', yMax: ' + yMax);
+
+    var dialOrientation = "";
 
     if (verticalDial === true) {
         dialOrientation = "vertical";
@@ -248,7 +301,7 @@ function readValues() {
             <h2>Results Table</h2>
             <hr />
             <h3>${now}\n\n</h3>
-            <p>For LAT: ${lat}, DEC: ${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
+            <p>For LAT: ${lat}, DEC: +/-${decSunRise}, the sun rise-time and set-time is at LHA: ${lhaSunrise}\n (${sunriseTime} before noon and ${sunsetTime} after noon)\n\n.</p>
             <p>Sunrise: ${startTime * 100} hours.  Sunset: ${endTime * 100} hours.</p>
             <p>Sunrise LHA: ${(startTime - 12) * 15}  Sunset LHA: ${(endTime - 12) * 15}</p>
             <hr>
@@ -256,16 +309,17 @@ function readValues() {
             <p>Dial Facing: ${omega} degrees.  Gnomon Distance: ${alpha}.  Dial tilt: ${tau} degrees`;
 
     // calculate the timelines for the current Latitude.
-
-    timeLines.length = 0;
-    let xx = 0
-    let yy = 0
+   
 
     for (t = startTime; t <= endTime; t += timeInterval / 60) {
 
-        let lhaT = (t - 12) * 15
+        console.log('t' +  t )
+        
+        let lhaT = (t - 12) * timeInterval;
 
         timeLines.push({ time: t, lha: lhaT, tL: [] });
+
+
 
         var index = timeLines.length - 1;
 
@@ -283,7 +337,7 @@ function readValues() {
                 xx = xHR(alpha, tau, theta, phi);
                 yy = -yHR(alpha, tau, theta, phi);
             }
-
+            // console.log(`t: ${t}, dec: ${decT}, lha: ${lhaT}, hC: ${hhC}, Zn: ${zzN}, Hac: ${hhAC}, phi: ${phi}, theta: ${theta}, x: ${xx}, y: ${yy}`);
             if (backView === true) {
                 xx = -xx;
             }
@@ -303,34 +357,39 @@ function readValues() {
             cvt = canvas.width / dialWidth
 
             if (theta >= 0 && (phi > -90 && phi < 90)) {
+                // Define physical plate boundaries relative to the origin
+                let halfWidth = dialWidth / 2;
 
-                timeLines[index].tL.push({ dec: decT, theta: theta, phi: phi, x: xx, y: yy });
+                // Check if point is within the physical dial dimensions
+                // (Adjust Y bounds based on your beta offest and dialHeight)
+                if (xx >= -halfWidth && xx <= halfWidth && yy >= -beta && yy <= (dialHeight - beta)) {       
 
-                if (xMax < xx) {
-                    xMax = xx;
-                }
+                    timeLines[index].tL.push({ dec: decT, theta: theta, phi: phi, x: xx, y: yy });
 
-                if (yMax < yy) {
-                    yMax = yy;
-                }
+                    if (xMax < xx) {
+                        xMax = xx;
+                    }
 
-                if (xMin > xx) {
-                    xMin = xx;
-                }
+                    if (yMax < yy) {
+                        yMax = yy;
+                    }
 
-                if (yMin > yy) {
-                    yMin = yy;
-                }
+                    if (xMin > xx) {
+                        xMin = xx;
+                    }
+
+                    if (yMin > yy) {
+                        yMin = yy;
+                    }
+  
+              }
             }
         }
     }
-    var firstElement = timeLines.shift()
-    //console.log(timeLines);
-
+    
     // Display the time Lines Data for each point on the dial.
 
-    const headerRow = document.querySelector('#data-table thead tr');
-    const bodyRow = document.getElementById('body-row');
+    
 
     // Step 1: Create time headers directly without extra empty cell
     timeLines.forEach(timeline => {
@@ -374,7 +433,7 @@ function readValues() {
 
     ctx.fillStyle = 'tan';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    
     console.log(`x: ${xMin}, ${xMax}, ${xMax - xMin} (${canvas.width})      y: ${yMin}, ${yMax}, ${yMax - yMin} (${canvas.height}) `);
     console.log(innerWidth, innerHeight);
     console.log(`cvt: ${cvt}`);

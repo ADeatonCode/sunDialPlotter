@@ -1,5 +1,9 @@
+/*
+  Look-and-feel for the Sundial Plotter page.
+  Lays out the form, the canvas, and print-friendly styles.
+*/
 body {
-    background-color: #2222
+    background-color: #2222;
 }
 
 h1 {
@@ -18,21 +22,25 @@ h2 {
 h3 {
     text-align: center;
 }
+
 #locationContainer,
 #inputForm {
     text-align: left;
     margin-left: 0;
 }
+
     #inputForm h2 {
         text-align: left !important;
         margin-left: 0;
     }
+
 .location-row {
     display: flex;
     padding: 10px;
     gap: 10px;
     justify-content: flex-start;
 }
+
 .location-row-left,
 .location-row-right {
     display: flex;
@@ -41,6 +49,7 @@ h3 {
     margin-left: 0;
     width: 250px;
 }
+
 .location-row-left {
     display: flex;
     justify-content: flex-start !important;
@@ -50,31 +59,39 @@ h3 {
     margin-right: auto;
     margin-left: 0 !important;
 }
+
 .location-row-right {
     display: flex;
     padding: 5px 10px;
     gap: 10px;
     justify-content: flex-end !important;
     align-items: center;
-    gap: 10px;
-    padding: 5px 10px;
-    width: 100%
+    width: 100%;
 }
-.location-row-left label,
-.location-row-right label {
-    margin-left: 0 !important;
-}
+
+    .location-row-left label,
+    .location-row-right label {
+        margin-left: 0 !important;
+    }
+
 .location-row-left label {
     width: 140px;
     flex-shrink: 0;
-    text-align:left;
+    text-align: left;
     margin-left: 0 !important;
 }
+
+label[for="locationName"],
+#locationName {
+    font-weight: bold;
+    font-size: calc(1em + 2px);
+}
+
 .location-row-left input,
 .location-row-right input {
     width: 250px;
 }
-    
+
 #location {
     display: flex;
     margin-left: 0;
@@ -90,36 +107,42 @@ h3 {
     text-align: left;
     width: 25%;
 }
+
 .top-form-layout {
     display: flex;
     gap: 40px;
     align-items: flex-start;
     width: 100%;
 }
-.top-form-layout .left-column {
-    display: flex;
-    flex-direction: column;
-}
+
+    .top-form-layout .left-column {
+        display: flex;
+        flex-direction: column;
+    }
+
     .top-form-layout .right-column {
         display: flex;
         flex-direction: column;
-        flex: .95;
+        flex: 0.95;
         height: 100%;
     }
-.right-colunm h2 {
+
+.right-column h2 {
     text-align: left !important;
     margin-left: 0;
     margin-top: 0;
     margin-bottom: 10px;
 }
+
 .top-form-layout .right-column textarea {
     width: 100%;
     height: 332px;
     min-height: 235px;
     resize: vertical;
 }
+
 label {
-    margin-left.: auto;
+    margin-left: auto;
 }
 
 .type-row {
@@ -133,86 +156,89 @@ label {
 textarea {
     width: 90%;
 }
+
 .type-col {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.type-col h2 {
-    text-align: left !important;
-    width: 220;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
+
+    .type-col h2 {
+        text-align: left !important;
+        width: 220px;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
 .radio-option {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 220px;
-    margin-bottom: 8px;
-}
-/* Master container holding all 6 configuration columns in a single row */
-.master-config-row {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 30px;
-    gap: 15px;
-    align-items: flex-start;
-}
-
-/* Individual column configuration */
-.config-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 0; /* Prevents overflow */
-}
-/* Consistent heading style for every column */
-.config-col h2 {
-    text-align: left !important;
-    width: 100%;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.05rem;
-    white-space: nowrap;
-}
-
-/* Radio option alignment for the type columns */
-.config-col .radio-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    white-space: nowrap;
-}
-
-/* Field row holding label and number input for the spec columns */
-.config-col .spec-field {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
-/* Streamlined label sizing to fit neatly within the 6-column layout */
-.config-col .spec-field label {
-    font-size: 0.85rem;
-    text-align: left;
-    flex-shrink: 0;
+/* Master container holding configuration columns */
+.master-config-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 30px;
+    gap: 20px;
+    align-items: flex-start;
 }
 
-/* Compact input sizing to match */
-.config-col .spec-field input {
-    width: 55px;
-    font-size: 0.85rem;
-    padding: 2px 4px;
+.config-col {
+    flex: 1 1 190px;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-/* Submit button centered cleanly below the entire master row */
+    .config-col h2 {
+        text-align: left !important;
+        width: 100%;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .config-col .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        white-space: nowrap;
+    }
+
+    .config-col .spec-field {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 6px;
+        gap: 10px;
+    }
+
+        .config-col .spec-field label {
+            font-size: 0.85rem;
+            text-align: left;
+            flex-shrink: 0;
+            width: 65px;
+        }
+
+        .config-col .spec-field input {
+            width: 100%;
+            max-width: 75px;
+            font-size: 0.85rem;
+            padding: 2px 4px;
+        }
+
+/* Unified Buttons and Containers */
 .buttonContainer {
     display: flex;
     justify-content: center;
@@ -221,21 +247,29 @@ textarea {
     clear: both;
 }
 
-    .buttonContainer button {
+    .button,
+    .buttonContainer button,
+    .downloadButton {
+        margin-top: 10px;
         padding: 10px 30px;
-        font-size: 1rem;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
         cursor: pointer;
+        border-radius: 5px;
+        font-size: 1rem;
+        height: 50px;
     }
-/* Container for the 4-column specifications row */
+
 .specs-row {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 30px;
+    flex-wrap: wrap;
     gap: 20px;
-    align-items:flex-start;
+    justify-content: center;
+    align-items: flex-start;
+    margin-bottom: 20px;
 }
-/* Individual spec column */
+
 .specs-col {
     flex: 1;
     display: flex;
@@ -243,16 +277,16 @@ textarea {
     align-items: flex-start;
     min-width: 0;
 }
-/* Heading style for each spec column */
-.specs-col h2 {
-    text-align: left !important;
-    width: 100%;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
-    white-space: nowrap;
-}
-/* Field row hoding label and number input */
+
+    .specs-col h2 {
+        text-align: left !important;
+        width: 100%;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        white-space: nowrap;
+    }
+
 .spec-field {
     display: flex;
     align-items: center;
@@ -260,48 +294,37 @@ textarea {
     width: 100%;
     margin-bottom: 8px;
 }
-/* Uniform label sizing for the spec fields */
-.spec-field label {
-    width: 130px;
-    text-align: left;
-    flex-shrink: 0;
+
+    .spec-field label {
+        width: 130px;
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    .spec-field input {
+        flex: 1;
+        min-width: 0;
+        max-width: 90px;
+    }
+
+.spec-group {
+    flex: 1 1 150px;
+    min-width: 140px;
 }
-/* Uniform input box sizing */
-.spec-field input {
-    flex: 1;
-    min-width: 0;
-    max-width: 90px;
-}
-/* Dial size row */
+
 .dialSize-row {
     display: flex;
     gap: 10px;
 }
 
-button {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    width: 25%;
-    height: 50px;
+.specification-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 0;
 }
 
-.buttonContainer {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    margin-top: 35px;
-    clear: both;
-}
-.buttonContainer button{
-    padding: 10px 30px;
-    font-size: 1rem;
-    cursor: pointer;
-}
 #results {
     margin-top: 20px;
     text-align: center;
@@ -326,29 +349,17 @@ button {
     padding: 10px;
 }
 
-.downloadButton {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    width: 25%;
-    height: 50px;
-}
-
 #downloadButtonContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 30vh; /* Center vertically within the viewport */
+    height: 30vh;
 }
 
 .canvas-container {
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    justify-content: center;
+    align-items: center;
 }
 
 #sundialCanvas {

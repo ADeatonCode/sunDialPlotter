@@ -219,6 +219,49 @@ document.getElementById("downloadButton").onclick = function () {
     }
 };
 
+// Print only the dial plot canvas (opens a clean print preview).
+function printDialPlot() {
+    const canvas = document.getElementById('sundialCanvas');
+    if (!canvas) {
+        return;
+    }
+
+    const location = document.getElementById('locationName')?.value || 'Sundial Plot';
+    const dataUrl = canvas.toDataURL('image/png');
+    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
+
+    if (!printWindow) {
+        window.print();
+        return;
+    }
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${location} — Dial Plot</title>
+  <style>
+    body { margin: 0; text-align: center; font-family: sans-serif; }
+    h1 { font-size: 1.25rem; margin: 12px 0; }
+    img { max-width: 100%; height: auto; border: 1px solid #000; }
+  </style>
+</head>
+<body>
+  <h1>${location} — Dial Plot</h1>
+  <img src="${dataUrl}" alt="Sundial dial plot">
+  <script>
+    window.onload = function () {
+      window.focus();
+      window.print();
+    };
+  <\/script>
+</body>
+</html>`);
+    printWindow.document.close();
+}
+
+document.getElementById("printPlotButton").onclick = printDialPlot;
+
 // Main function to plot the sundial
 
 // Read every form field and store the numbers for drawing.

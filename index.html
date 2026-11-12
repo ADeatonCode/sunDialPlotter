@@ -8,7 +8,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/sundial.css">
+    <link rel="stylesheet" href="styles/sundial-app.css?v=20261112c">
+    <style>
+      /* Fallback so the page stays readable even if an old CSS file is cached. */
+      body { background-color: #c0c0c0; color: #111111; }
+      input, textarea, select { color: #111111; }
+      .action-btn,
+      #downloadButton,
+      #printPlotButton,
+      .buttonContainer button {
+        background-color: #4CAF50 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 10px 30px;
+        border-radius: 5px;
+        font-size: 1rem;
+        height: 50px;
+        cursor: pointer;
+      }
+    </style>
     <title>Sun Dial Plotter</title>
 </head>
 <body>
@@ -25,15 +43,15 @@
                     <h2>Location Information</h2>
                     <div class="location-row-left">
                         <label for="locationName">Location Name:</label>
-                        <input type="text" id="locationName" name="locationName" value="WCFA">
+                        <input type="text" id="locationName" name="locationName" value="Centinnial Park">
                     </div>
                     <div class="location-row-left">
                         <label for="address">Address:</label>
-                        <input type="text" id="address" name="address" value="1440 Union Springs Road">
+                        <input type="text" id="address" name="address" value="2500 Centennial Park Dr">
                     </div>
                     <div class="location-row-left">
                         <label for="city">City:</label>
-                        <input type="text" id="city" name="city" value="Whiteville">
+                        <input type="text" id="city" name="city" value="Nashville">
                     </div>
                     <div class="location-row-left">
                         <label for="state">State:</label>
@@ -41,25 +59,25 @@
                     </div>
                     <div class="location-row-left">
                         <label for="zip">Zip Code:</label>
-                        <input type="text" id="zip" name="zip" value="38075">
+                        <input type="text" id="zip" name="zip" value="37203">
                     </div>
 
                     <h2>Coordinates</h2>
                     <!-- Lat and Lon are used to calculate the sun's position and plot the sundial. Default values are for Whiteville, TN. -->
                     <div class="location-row-left">
                         <label for="lat">Latitude:</label>
-                        <input type="number" id="lat" name="coordinates" step="any" value="35.3265">
+                        <input type="number" id="lat" name="coordinates" step="any" value="36.1497">
                     </div>
                     <div class="location-row-left">
                         <label for="lon">Longitude:</label>
-                        <input type="number" id="lon" name="coordinates" step="any" value="-89.1495">
+                        <input type="number" id="lon" name="coordinates" step="any" value="-86.8134">
                     </div>
                 </div>
 
                 <!-- Right Column: Description -->
                 <div class="right-column">
                     <h2>Description</h2>
-                    <textarea id="description" name="description" placeholder="Parchment dial with popsicle stick frame"></textarea>
+                    <textarea id="description" name="description" placeholder="If it were plotted on a vertical wall 100 x 100 ft facing 202.5 degrees west of south."></textarea>
                 </div>
 
             </div>
@@ -99,11 +117,11 @@
                     <h2>Dial Dimensions</h2>
                     <div class="spec-field">
                         <label for="dialHeight">Height:</label>
-                        <input type="number" id="dialHeight" name="dialSize" step="1" value="28">
+                        <input type="number" id="dialHeight" name="dialSize" step="1" value="100">
                     </div>
                     <div class="spec-field">
                         <label for="dialWidth">Width:</label>
-                        <input type="number" id="dialWidth" name="dialSize" step="1" value="12">
+                        <input type="number" id="dialWidth" name="dialSize" step="1" value="100">
                     </div>
                 </div>
 
@@ -112,11 +130,11 @@
                     <h2>Gnomon Specs</h2>
                     <div class="spec-field">
                         <label for="alpha">Distance:</label>
-                        <input type="number" id="alpha" name="alpha" step="any" value="6.4568">
+                        <input type="number" id="alpha" name="alpha" step="any" value="14.1421">
                     </div>
                     <div class="spec-field">
                         <label for="beta">Length:</label>
-                        <input type="number" id="beta" name="beta" step="any" value="5">
+                        <input type="number" id="beta" name="beta" step="any" value="10">
                     </div>
                 </div>
 
@@ -146,7 +164,7 @@
 
             <!-- Submit Button Centered Underneath -->
             <div class="buttonContainer">
-                <button type="button" onclick="readValues()">Submit</button>
+                <button type="button" class="action-btn" onclick="readValues()">Submit</button>
             </div>
             <hr />
             <div id="results"></div>
@@ -163,13 +181,16 @@
                 </tbody>
             </table>
             <div id="downloadButtonContainer">
-                <button id="downloadButton">Download CSV</button>
+                <button type="button" id="downloadButton" class="action-btn">Download CSV</button>
             </div>
             <hr />
             <h2 id="dialPlotTitle">Dial Plot</h2>
             <div class="canvas-container">
                 <canvas id="sundialCanvas" width="400" height="400"></canvas>
             </div>
-            <script src="scripts/sundial.js"></script>
+            <div id="printPlotButtonContainer">
+                <button type="button" id="printPlotButton" class="action-btn">Print Plot</button>
+            </div>
+            <script src="scripts/sundial-app.js"></script>
 </body>
 </html>

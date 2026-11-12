@@ -3,7 +3,8 @@
   Lays out the form, the canvas, and print-friendly styles.
 */
 body {
-    background-color: #2222;
+    background-color: #c0c0c0;
+    color: #111111;
 }
 
 h1 {
@@ -247,19 +248,22 @@ textarea {
     clear: both;
 }
 
-    .button,
-    .buttonContainer button,
-    .downloadButton {
-        margin-top: 10px;
-        padding: 10px 30px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        font-size: 1rem;
-        height: 50px;
-    }
+.action-btn,
+.button,
+.buttonContainer button,
+.downloadButton,
+#downloadButton,
+#printPlotButton {
+    margin-top: 10px;
+    padding: 10px 30px;
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: none !important;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: 50px;
+}
 
 .specs-row {
     display: flex;
@@ -353,7 +357,23 @@ textarea {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 30vh;
+    width: 100%;
+    margin: 15px 0 30px;
+    text-align: center;
+}
+
+#downloadButton {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 10px 30px;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: 50px;
+    cursor: pointer;
 }
 
 .canvas-container {
@@ -362,7 +382,63 @@ textarea {
     align-items: center;
 }
 
+#printPlotButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 15px 0 30px;
+    text-align: center;
+}
+
+#printPlotButton {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 10px 30px;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: 50px;
+    cursor: pointer;
+}
+
 #sundialCanvas {
     border: 1px solid black;
     margin: 5px 5px;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #dialPlotTitle,
+    #dialPlotTitle *,
+    .canvas-container,
+    .canvas-container * {
+        visibility: visible;
+    }
+
+    #dialPlotTitle,
+    .canvas-container {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    #dialPlotTitle {
+        top: 0;
+    }
+
+    .canvas-container {
+        top: 40px;
+    }
+
+    #printPlotButtonContainer {
+        display: none !important;
+    }
 }

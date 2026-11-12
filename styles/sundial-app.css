@@ -1,0 +1,444 @@
+/*
+  Look-and-feel for the Sundial Plotter page.
+  Lays out the form, the canvas, and print-friendly styles.
+*/
+body {
+    background-color: #c0c0c0;
+    color: #111111;
+}
+
+h1 {
+    text-align: center;
+}
+
+#about {
+    margin-top: 20px;
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+}
+
+#locationContainer,
+#inputForm {
+    text-align: left;
+    margin-left: 0;
+}
+
+    #inputForm h2 {
+        text-align: left !important;
+        margin-left: 0;
+    }
+
+.location-row {
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.location-row-left,
+.location-row-right {
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+    margin-left: 0;
+    width: 250px;
+}
+
+.location-row-left {
+    display: flex;
+    justify-content: flex-start !important;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: 0 !important;
+}
+
+.location-row-right {
+    display: flex;
+    padding: 5px 10px;
+    gap: 10px;
+    justify-content: flex-end !important;
+    align-items: center;
+    width: 100%;
+}
+
+    .location-row-left label,
+    .location-row-right label {
+        margin-left: 0 !important;
+    }
+
+.location-row-left label {
+    width: 140px;
+    flex-shrink: 0;
+    text-align: left;
+    margin-left: 0 !important;
+}
+
+label[for="locationName"],
+#locationName {
+    font-weight: bold;
+    font-size: calc(1em + 2px);
+}
+
+.location-row-left input,
+.location-row-right input {
+    width: 250px;
+}
+
+#location {
+    display: flex;
+    margin-left: 0;
+    margin-top: 10px;
+    text-align: left;
+    width: 25%;
+}
+
+.coordinates {
+    display: flex;
+    margin-top: 10px;
+    margin-right: auto;
+    text-align: left;
+    width: 25%;
+}
+
+.top-form-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+    .top-form-layout .left-column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .top-form-layout .right-column {
+        display: flex;
+        flex-direction: column;
+        flex: 0.95;
+        height: 100%;
+    }
+
+.right-column h2 {
+    text-align: left !important;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.top-form-layout .right-column textarea {
+    width: 100%;
+    height: 332px;
+    min-height: 235px;
+    resize: vertical;
+}
+
+label {
+    margin-left: auto;
+}
+
+.type-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 25px;
+    gap: 30px;
+}
+
+textarea {
+    width: 90%;
+}
+
+.type-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .type-col h2 {
+        text-align: left !important;
+        width: 220px;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+/* Master container holding configuration columns */
+.master-config-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 30px;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.config-col {
+    flex: 1 1 190px;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+    .config-col h2 {
+        text-align: left !important;
+        width: 100%;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .config-col .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        white-space: nowrap;
+    }
+
+    .config-col .spec-field {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 6px;
+        gap: 10px;
+    }
+
+        .config-col .spec-field label {
+            font-size: 0.85rem;
+            text-align: left;
+            flex-shrink: 0;
+            width: 65px;
+        }
+
+        .config-col .spec-field input {
+            width: 100%;
+            max-width: 75px;
+            font-size: 0.85rem;
+            padding: 2px 4px;
+        }
+
+/* Unified Buttons and Containers */
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 35px;
+    clear: both;
+}
+
+.action-btn,
+.button,
+.buttonContainer button,
+.downloadButton,
+#downloadButton,
+#printPlotButton {
+    margin-top: 10px;
+    padding: 10px 30px;
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: none !important;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: 50px;
+}
+
+.specs-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.specs-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+    .specs-col h2 {
+        text-align: left !important;
+        width: 100%;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        white-space: nowrap;
+    }
+
+.spec-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+    .spec-field label {
+        width: 130px;
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    .spec-field input {
+        flex: 1;
+        min-width: 0;
+        max-width: 90px;
+    }
+
+.spec-group {
+    flex: 1 1 150px;
+    min-width: 140px;
+}
+
+.dialSize-row {
+    display: flex;
+    gap: 10px;
+}
+
+.specification-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 0;
+}
+
+#results {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.row {
+    display: flex;
+}
+
+.column {
+    flex: 25%;
+    padding: 10px;
+}
+
+.timeLineRow {
+    display: flex;
+    gap: 10px;
+}
+
+.timeLineColumn {
+    flex: 10%;
+    padding: 10px;
+}
+
+#downloadButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 15px 0 30px;
+    text-align: center;
+}
+
+#downloadButton {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 10px 30px;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: 50px;
+    cursor: pointer;
+}
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#printPlotButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 15px 0 30px;
+    text-align: center;
+}
+
+#printPlotButton {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 10px 30px;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: 50px;
+    cursor: pointer;
+}
+
+#sundialCanvas {
+    border: 1px solid black;
+    margin: 5px 5px;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #dialPlotTitle,
+    #dialPlotTitle *,
+    .canvas-container,
+    .canvas-container * {
+        visibility: visible;
+    }
+
+    #dialPlotTitle,
+    .canvas-container {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    #dialPlotTitle {
+        top: 0;
+    }
+
+    .canvas-container {
+        top: 40px;
+    }
+
+    #printPlotButtonContainer {
+        display: none !important;
+    }
+}
